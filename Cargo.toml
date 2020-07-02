@@ -1,0 +1,17 @@
+[package]
+name = "rey_skytracer"
+version = "0.1.0"
+authors = ["Daniel Popa <danielpopacristobal@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "rey_skytracer"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rey_skytracer"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
