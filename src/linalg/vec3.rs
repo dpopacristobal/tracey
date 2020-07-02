@@ -2,108 +2,91 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, 
 
 #[derive(Debug, PartialEq)]
 pub struct Vec3 {
-    v0: f64,
-    v1: f64,
-    v2: f64,
+    x: f64,
+    y: f64,
+    z: f64,
 }
 
-// [TODO] Might be worth looking into wrapping these into tuples so that they can each have their own methods and do not share functionality.
-pub type Color = Vec3;
+pub type Point3 = Vec3;
 
 impl Vec3 {
-    pub fn new(v0: f64, v1: f64, v2: f64) -> Self {
-        Vec3 { v0, v1, v2 }
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Vec3 { x, y, z }
     }
 
     pub fn from_scalar(v: f64) -> Self {
-        Vec3 {
-            v0: v,
-            v1: v,
-            v2: v,
-        }
+        Vec3 { x: v, y: v, z: v }
     }
 
     pub fn x(&self) -> f64 {
-        self.v0
+        self.x
     }
 
     pub fn y(&self) -> f64 {
-        self.v1
+        self.y
     }
 
     pub fn z(&self) -> f64 {
-        self.v2
+        self.z
     }
 
     pub fn length(&self) -> f64 {
-        (self.v0 * self.v0 + self.v1 * self.v1 + self.v2 * self.v2).sqrt()
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
     pub fn length_sq(&self) -> f64 {
-        self.v0 * self.v0 + self.v1 * self.v1 + self.v2 * self.v2
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn dot(&self, rhs: &Self) -> f64 {
-        self.v0 * rhs.v0 + self.v1 * rhs.v1 + self.v2 * rhs.v2
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     pub fn cross(self, rhs: &Self) -> Self {
         Self {
-            v0: self.v1 * rhs.v2 - self.v2 * rhs.v1,
-            v1: self.v2 * rhs.v0 - self.v0 * rhs.v2,
-            v2: self.v0 * rhs.v1 - self.v1 * rhs.v0,
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
         }
     }
 
     pub fn into_unit_vec(self) -> Self {
         Self {
-            v0: self.v0 / self.length(),
-            v1: self.v1 / self.length(),
-            v2: self.v2 / self.length(),
+            x: self.x / self.length(),
+            y: self.y / self.length(),
+            z: self.z / self.length(),
         }
-    }
-
-    pub fn r(&self) -> f64 {
-        self.v0
-    }
-
-    pub fn g(&self) -> f64 {
-        self.v1
-    }
-
-    pub fn b(&self) -> f64 {
-        self.v2
     }
 
     pub fn add_scalar(self, rhs: f64) -> Self {
         Self {
-            v0: self.v0 + rhs,
-            v1: self.v1 + rhs,
-            v2: self.v2 + rhs,
+            x: self.x + rhs,
+            y: self.y + rhs,
+            z: self.z + rhs,
         }
     }
 
     pub fn sub_scalar(self, rhs: f64) -> Self {
         Self {
-            v0: self.v0 - rhs,
-            v1: self.v1 - rhs,
-            v2: self.v2 - rhs,
+            x: self.x - rhs,
+            y: self.y - rhs,
+            z: self.z - rhs,
         }
     }
 
     pub fn mul_scalar(self, rhs: f64) -> Self {
         Self {
-            v0: self.v0 * rhs,
-            v1: self.v1 * rhs,
-            v2: self.v2 * rhs,
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 
     pub fn div_scalar(self, rhs: f64) -> Self {
         Self {
-            v0: self.v0 / rhs,
-            v1: self.v1 / rhs,
-            v2: self.v2 / rhs,
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
         }
     }
 }
@@ -113,9 +96,9 @@ impl Add for Vec3 {
 
     fn add(self, rhs: Self) -> Self {
         Self {
-            v0: self.v0 + rhs.v0,
-            v1: self.v1 + rhs.v1,
-            v2: self.v2 + rhs.v2,
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         }
     }
 }
@@ -123,9 +106,9 @@ impl Add for Vec3 {
 impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         *self = Self {
-            v0: self.v0 + rhs.v0,
-            v1: self.v1 + rhs.v1,
-            v2: self.v2 + rhs.v2,
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         };
     }
 }
@@ -135,9 +118,9 @@ impl Sub for Vec3 {
 
     fn sub(self, rhs: Self) -> Self {
         Self {
-            v0: self.v0 - rhs.v0,
-            v1: self.v1 - rhs.v1,
-            v2: self.v2 - rhs.v2,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         }
     }
 }
@@ -145,9 +128,9 @@ impl Sub for Vec3 {
 impl SubAssign for Vec3 {
     fn sub_assign(&mut self, rhs: Self) {
         *self = Self {
-            v0: self.v0 - rhs.v0,
-            v1: self.v1 - rhs.v1,
-            v2: self.v2 - rhs.v2,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         };
     }
 }
@@ -157,9 +140,9 @@ impl Mul for Vec3 {
 
     fn mul(self, rhs: Self) -> Self {
         Self {
-            v0: self.v0 * rhs.v0,
-            v1: self.v1 * rhs.v1,
-            v2: self.v2 * rhs.v2,
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
         }
     }
 }
@@ -167,9 +150,9 @@ impl Mul for Vec3 {
 impl MulAssign for Vec3 {
     fn mul_assign(&mut self, rhs: Self) {
         *self = Self {
-            v0: self.v0 * rhs.v0,
-            v1: self.v1 * rhs.v1,
-            v2: self.v2 * rhs.v2,
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
         };
     }
 }
@@ -179,9 +162,9 @@ impl Div for Vec3 {
 
     fn div(self, rhs: Self) -> Self {
         Self {
-            v0: self.v0 / rhs.v0,
-            v1: self.v1 / rhs.v1,
-            v2: self.v2 / rhs.v2,
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z,
         }
     }
 }
@@ -189,9 +172,9 @@ impl Div for Vec3 {
 impl DivAssign for Vec3 {
     fn div_assign(&mut self, rhs: Self) {
         *self = Self {
-            v0: self.v0 / rhs.v0,
-            v1: self.v1 / rhs.v1,
-            v2: self.v2 / rhs.v2,
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z,
         };
     }
 }
@@ -201,9 +184,9 @@ impl Index<usize> for Vec3 {
 
     fn index(&self, index: usize) -> &Self::Output {
         match index {
-            0 => &self.v0,
-            1 => &self.v1,
-            2 => &self.v2,
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
             _ => panic!(),
         }
     }
@@ -212,9 +195,9 @@ impl Index<usize> for Vec3 {
 impl IndexMut<usize> for Vec3 {
     fn index_mut(&mut self, index: usize) -> &mut f64 {
         match index {
-            0 => &mut self.v0,
-            1 => &mut self.v1,
-            2 => &mut self.v2,
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
             _ => panic!(),
         }
     }
@@ -223,7 +206,7 @@ impl IndexMut<usize> for Vec3 {
 // [TODO] Make testing more exhaustive by not having 0.0 in the tests,
 #[cfg(test)]
 mod test {
-    use super::{Color, Vec3};
+    use super::Vec3;
 
     #[test]
     fn vec3_constructor() {
@@ -261,34 +244,15 @@ mod test {
     }
 
     #[test]
-    fn color_value_access() {
-        let lhs = Color::new(0.0, 1.0, 2.0);
-
-        assert_eq!(lhs.r(), 0.0);
-        assert_eq!(lhs.g(), 1.0);
-        assert_eq!(lhs.b(), 2.0);
-
-        assert_eq!(lhs[0], 0.0);
-        assert_eq!(lhs[1], 1.0);
-        assert_eq!(lhs[2], 2.0);
-
-        let mut lhs = Color::new(0.0, 1.0, 2.0);
-
-        assert_eq!(lhs.r(), 0.0);
-        assert_eq!(lhs.g(), 1.0);
-        assert_eq!(lhs.b(), 2.0);
-    }
-
-    #[test]
     fn vec3_add() {
         let lhs = Vec3::new(0.0, 1.0, 2.0);
         let rhs = Vec3::new(0.0, 1.0, 2.0);
         assert_eq!(
             lhs + rhs,
             Vec3 {
-                v0: 0.0,
-                v1: 2.0,
-                v2: 4.0
+                x: 0.0,
+                y: 2.0,
+                z: 4.0
             }
         );
 
@@ -298,9 +262,9 @@ mod test {
         assert_eq!(
             lhs,
             Vec3 {
-                v0: 0.0,
-                v1: 2.0,
-                v2: 4.0
+                x: 0.0,
+                y: 2.0,
+                z: 4.0
             }
         );
 
@@ -308,9 +272,9 @@ mod test {
         assert_eq!(
             lhs.add_scalar(1.0),
             Vec3 {
-                v0: 1.0,
-                v1: 2.0,
-                v2: 3.0
+                x: 1.0,
+                y: 2.0,
+                z: 3.0
             }
         );
     }
@@ -322,9 +286,9 @@ mod test {
         assert_eq!(
             lhs - rhs,
             Vec3 {
-                v0: 0.0,
-                v1: 0.0,
-                v2: 0.0
+                x: 0.0,
+                y: 0.0,
+                z: 0.0
             }
         );
 
@@ -334,9 +298,9 @@ mod test {
         assert_eq!(
             lhs,
             Vec3 {
-                v0: 0.0,
-                v1: 0.0,
-                v2: 0.0
+                x: 0.0,
+                y: 0.0,
+                z: 0.0
             }
         );
 
@@ -344,9 +308,9 @@ mod test {
         assert_eq!(
             lhs.sub_scalar(-1.0),
             Vec3 {
-                v0: 1.0,
-                v1: 2.0,
-                v2: 3.0
+                x: 1.0,
+                y: 2.0,
+                z: 3.0
             }
         );
     }
@@ -358,9 +322,9 @@ mod test {
         assert_eq!(
             lhs * rhs,
             Vec3 {
-                v0: 0.0,
-                v1: 3.0,
-                v2: 6.0
+                x: 0.0,
+                y: 3.0,
+                z: 6.0
             }
         );
 
@@ -370,9 +334,9 @@ mod test {
         assert_eq!(
             lhs,
             Vec3 {
-                v0: 0.0,
-                v1: 3.0,
-                v2: 6.0
+                x: 0.0,
+                y: 3.0,
+                z: 6.0
             }
         );
 
@@ -380,9 +344,9 @@ mod test {
         assert_eq!(
             lhs.mul_scalar(2.0),
             Vec3 {
-                v0: 0.0,
-                v1: 2.0,
-                v2: 4.0
+                x: 0.0,
+                y: 2.0,
+                z: 4.0
             }
         );
     }
@@ -394,9 +358,9 @@ mod test {
         assert_eq!(
             lhs / rhs,
             Vec3 {
-                v0: 0.0,
-                v1: 0.5,
-                v2: 0.5
+                x: 0.0,
+                y: 0.5,
+                z: 0.5
             }
         );
 
@@ -406,9 +370,9 @@ mod test {
         assert_eq!(
             lhs,
             Vec3 {
-                v0: 0.0,
-                v1: 0.5,
-                v2: 0.5
+                x: 0.0,
+                y: 0.5,
+                z: 0.5
             }
         );
 
@@ -416,9 +380,9 @@ mod test {
         assert_eq!(
             lhs.div_scalar(2.0),
             Vec3 {
-                v0: 0.0,
-                v1: 0.5,
-                v2: 1.0
+                x: 0.0,
+                y: 0.5,
+                z: 1.0
             }
         );
     }
@@ -450,9 +414,9 @@ mod test {
         assert_eq!(
             lhs.cross(&rhs),
             Vec3 {
-                v0: -1.0,
-                v1: 2.0,
-                v2: -1.0
+                x: -1.0,
+                y: 2.0,
+                z: -1.0
             }
         );
     }
@@ -464,9 +428,9 @@ mod test {
         assert_eq!(
             lhs.into_unit_vec(),
             Vec3 {
-                v0: 1.0 / len.sqrt(),
-                v1: 2.0 / len.sqrt(),
-                v2: 3.0 / len.sqrt()
+                x: 1.0 / len.sqrt(),
+                y: 2.0 / len.sqrt(),
+                z: 3.0 / len.sqrt()
             }
         );
     }
