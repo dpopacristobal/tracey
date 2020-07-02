@@ -1,5 +1,6 @@
-pub mod linalg;
-use linalg::vec3::Vec3;
+extern crate rey_skytracer;
+
+use rey_skytracer::linalg::vec3::{Color, Point};
 
 fn main() {
     // let image_width = 256;
@@ -22,6 +23,4 @@ fn main() {
     //         println!("{} {} {}", ir, ig, ib);
     //     }
     // }
-
-    let a = Vec3::new(1.0, 2.0, 3.0);
 }
