@@ -1,6 +1,6 @@
 extern crate rey_skytracer;
 
-use rey_skytracer::linalg::vec3::{Color, Point};
+use rey_skytracer::linalg::vec3::{Color, Vec3};
 
 fn main() {
     // let image_width = 256;
