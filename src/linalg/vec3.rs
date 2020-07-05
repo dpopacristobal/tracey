@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -18,31 +18,31 @@ impl Vec3 {
         Vec3 { x: v, y: v, z: v }
     }
 
-    pub fn x(&self) -> f64 {
+    pub fn x(self) -> f64 {
         self.x
     }
 
-    pub fn y(&self) -> f64 {
+    pub fn y(self) -> f64 {
         self.y
     }
 
-    pub fn z(&self) -> f64 {
+    pub fn z(self) -> f64 {
         self.z
     }
 
-    pub fn length(&self) -> f64 {
+    pub fn length(self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn length_sq(&self) -> f64 {
+    pub fn length_sq(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn dot(&self, rhs: &Self) -> f64 {
+    pub fn dot(self, rhs: Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(self, rhs: &Self) -> Self {
+    pub fn cross(self, rhs: Self) -> Self {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
             y: self.z * rhs.x - self.x * rhs.z,
@@ -404,7 +404,7 @@ mod test {
     fn vec3_dot() {
         let lhs = Vec3::new(1.0, 2.0, 3.0);
         let rhs = Vec3::new(2.0, 3.0, 4.0);
-        assert_eq!(lhs.dot(&rhs), 20.0);
+        assert_eq!(lhs.dot(rhs), 20.0);
     }
 
     #[test]
@@ -412,7 +412,7 @@ mod test {
         let lhs = Vec3::new(1.0, 2.0, 3.0);
         let rhs = Vec3::new(2.0, 3.0, 4.0);
         assert_eq!(
-            lhs.cross(&rhs),
+            lhs.cross(rhs),
             Vec3 {
                 x: -1.0,
                 y: 2.0,

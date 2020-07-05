@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Color {
     r: f64,
     g: f64,
@@ -17,15 +17,15 @@ impl Color {
         Color { r: v, g: v, b: v }
     }
 
-    pub fn r(&self) -> f64 {
+    pub fn r(self) -> f64 {
         self.r
     }
 
-    pub fn g(&self) -> f64 {
+    pub fn g(self) -> f64 {
         self.g
     }
 
-    pub fn b(&self) -> f64 {
+    pub fn b(self) -> f64 {
         self.b
     }
 
