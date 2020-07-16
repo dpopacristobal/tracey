@@ -1,8 +1,11 @@
+use std::rc::Rc;
+
 extern crate image;
+extern crate rand;
+
+use rand::Rng;
 
 extern crate rey_skytracer;
-
-use std::rc::Rc;
 
 use rey_skytracer::linalg::color::Color;
 use rey_skytracer::linalg::ray::Ray;
@@ -11,6 +14,21 @@ use rey_skytracer::linalg::vec3::{Point3, Vec3};
 fn degrees_to_radians(degrees: f64) -> f64
 {
     (degrees * std::f64::consts::PI) / 180.0
+}
+
+fn clamp(val: f64, min: f64, max: f64) -> f64
+{
+    if val < min
+    {
+        return min;
+    }
+
+    if val > max
+    {
+        return max;
+    }
+
+    val
 }
 
 #[derive(Clone)]
@@ -161,6 +179,49 @@ impl Hit for Sphere
     }
 }
 
+struct Camera
+{
+    origin: Point3,
+    lower_left_corner: Point3,
+    horizontal: Vec3,
+    vertical: Vec3,
+}
+
+impl Camera
+{
+    fn new() -> Self
+    {
+        let aspect_ratio = 16.0 / 9.0;
+        let viewport_height = 2.0;
+        let viewport_width = aspect_ratio * viewport_height;
+        let focal_length = 1.0;
+
+        let origin = Point3::from_scalar(0.0);
+        let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
+        let vertical = Vec3::new(0.0, viewport_height, 0.0);
+        let lower_left_corner = origin
+            - horizontal.div_scalar(2.0)
+            - vertical.div_scalar(2.0)
+            - Vec3::new(0.0, 0.0, focal_length);
+
+        Camera {
+            origin,
+            lower_left_corner,
+            horizontal,
+            vertical,
+        }
+    }
+
+    fn get_ray(&self, u: f64, v: f64) -> Ray
+    {
+        Ray::new(
+            self.origin,
+            self.lower_left_corner + self.horizontal.mul_scalar(u) + self.vertical.mul_scalar(v)
+                - self.origin,
+        )
+    }
+}
+
 fn ray_color(ray: Ray, world: &HittableList) -> Color
 {
     let mut hit_record =
@@ -180,37 +241,31 @@ fn main()
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
+    let samples_per_pixel = 100;
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
-
-    let viewport_height = 2.0;
-    let viewport_width = aspect_ratio * viewport_height;
-    let focal_length = 1.0;
-
-    let origin = Point3::from_scalar(0.0);
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner = origin
-        - horizontal.div_scalar(2.0)
-        - vertical.div_scalar(2.0)
-        - Vec3::new(0.0, 0.0, focal_length);
 
     let mut world = HittableList::new();
     world.add(Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
     world.add(Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
-    for (x, y, pixel) in image_buffer.enumerate_pixels_mut()
+    let camera = Camera::new();
+    let mut rng = rand::thread_rng();
+
+    for (i, j, pixel) in image_buffer.enumerate_pixels_mut()
     {
-        let u = x as f64 / (image_width - 1) as f64;
-        let v = (image_height - y) as f64 / (image_height - 1) as f64;
+        let mut pixel_color_accumulator = Color::from_scalar(0.0);
+        for _ in 0..samples_per_pixel
+        {
+            let u = (i as f64 + rng.gen_range(0.0, 1.0)) / (image_width - 1) as f64;
+            let v =
+                ((image_height - j) as f64 + rng.gen_range(0.0, 1.0)) / (image_height - 1) as f64;
+            let ray = camera.get_ray(u, v);
+            pixel_color_accumulator.accumulate_sample(ray_color(ray, &world));
+        }
 
-        let ray = Ray::new(
-            origin,
-            lower_left_corner + horizontal.mul_scalar(u) + vertical.mul_scalar(v) - origin,
-        );
-        let color = ray_color(ray, &world);
-
-        *pixel = image::Rgb(color.into_rgb8());
+        let pixel_color: Color = pixel_color_accumulator.average_samples(samples_per_pixel);
+        *pixel = image::Rgb(pixel_color.into_rgb8());
     }
 
     image_buffer.save("rendered_image.png").unwrap();

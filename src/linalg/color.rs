@@ -80,6 +80,24 @@ impl Color
 
         [ir, ig, ib]
     }
+
+    pub fn accumulate_sample(&mut self, rhs: Self)
+    {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+    }
+
+    pub fn average_samples(self, num_of_samples: i32) -> Self
+    {
+        let inverse = 1.0 / num_of_samples as f64;
+
+        Self {
+            r: self.r * inverse,
+            g: self.g * inverse,
+            b: self.b * inverse,
+        }
+    }
 }
 
 impl Add for Color
