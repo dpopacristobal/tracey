@@ -222,13 +222,24 @@ impl Camera
     }
 }
 
-fn ray_color(ray: Ray, world: &HittableList) -> Color
+fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
 {
     let mut hit_record =
         HitRecord::new(Point3::from_scalar(0.0), Vec3::from_scalar(0.0), 0.0, false);
+    if depth <= 0
+    {
+        return Color::from_scalar(0.0);
+    }
+
     if world.hit(ray, 0.0, f64::INFINITY, &mut hit_record)
     {
-        return (hit_record.normal.into_color() + Color::from_scalar(1.0)).mul_scalar(0.5);
+        let target = hit_record.hit_point + hit_record.normal + Vec3::random_in_unit_sphere();
+        return ray_color(
+            Ray::new(hit_record.hit_point, target - hit_record.hit_point),
+            world,
+            depth - 1,
+        )
+        .mul_scalar(0.5);
     }
 
     let unit_direction = ray.direction().into_unit_vec();
@@ -241,7 +252,8 @@ fn main()
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 10;
+    let max_depth = 50;
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
@@ -261,11 +273,11 @@ fn main()
             let v =
                 ((image_height - j) as f64 + rng.gen_range(0.0, 1.0)) / (image_height - 1) as f64;
             let ray = camera.get_ray(u, v);
-            pixel_color_accumulator.accumulate_sample(ray_color(ray, &world));
+            pixel_color_accumulator.accumulate_sample(ray_color(ray, &world, max_depth));
         }
 
         let pixel_color: Color = pixel_color_accumulator.average_samples(samples_per_pixel);
-        *pixel = image::Rgb(pixel_color.into_rgb8());
+        *pixel = image::Rgb(pixel_color.gamma_2_correct().into_rgb8());
     }
 
     image_buffer.save("rendered_image.png").unwrap();

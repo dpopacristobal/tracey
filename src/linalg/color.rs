@@ -1,6 +1,8 @@
 use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
+use rand::Rng;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Color
 {
@@ -72,6 +74,16 @@ impl Color
         }
     }
 
+    pub fn random_from_bounds(low: f64, high: f64) -> Self
+    {
+        let mut rng = rand::thread_rng();
+        Self {
+            r: rng.gen_range(low, high),
+            g: rng.gen_range(low, high),
+            b: rng.gen_range(low, high),
+        }
+    }
+
     pub fn into_rgb8(self) -> [u8; 3]
     {
         let ir = (255.99 * self.r) as u8;
@@ -79,6 +91,15 @@ impl Color
         let ib = (255.99 * self.b) as u8;
 
         [ir, ig, ib]
+    }
+
+    pub fn gamma_2_correct(self) -> Self
+    {
+        Self {
+            r: self.r.sqrt(),
+            g: self.g.sqrt(),
+            b: self.b.sqrt(),
+        }
     }
 
     pub fn accumulate_sample(&mut self, rhs: Self)

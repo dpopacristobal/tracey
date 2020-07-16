@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
+use rand::Rng;
+
 use super::color::Color;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -22,6 +24,18 @@ impl Vec3
     pub fn from_scalar(v: f64) -> Self
     {
         Vec3 { x: v, y: v, z: v }
+    }
+
+    pub fn random_in_unit_sphere() -> Self
+    {
+        loop
+        {
+            let vec = Self::random_from_bounds(-1.0, 1.0);
+            if vec.length_sq() <= 1.0
+            {
+                return vec;
+            }
+        }
     }
 
     pub fn x(self) -> f64
@@ -105,6 +119,16 @@ impl Vec3
             x: self.x / rhs,
             y: self.y / rhs,
             z: self.z / rhs,
+        }
+    }
+
+    pub fn random_from_bounds(low: f64, high: f64) -> Self
+    {
+        let mut rng = rand::thread_rng();
+        Self {
+            x: rng.gen_range(low, high),
+            y: rng.gen_range(low, high),
+            z: rng.gen_range(low, high),
         }
     }
 
