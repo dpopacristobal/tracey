@@ -231,9 +231,9 @@ fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
         return Color::from_scalar(0.0);
     }
 
-    if world.hit(ray, 0.0, f64::INFINITY, &mut hit_record)
+    if world.hit(ray, 0.001, f64::INFINITY, &mut hit_record)
     {
-        let target = hit_record.hit_point + hit_record.normal + Vec3::random_in_unit_sphere();
+        let target = hit_record.hit_point + hit_record.normal + Vec3::random_unit_vector();
         return ray_color(
             Ray::new(hit_record.hit_point, target - hit_record.hit_point),
             world,

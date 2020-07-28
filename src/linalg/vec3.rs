@@ -18,23 +18,25 @@ impl Vec3
 {
     pub fn new(x: f64, y: f64, z: f64) -> Self
     {
-        Vec3 { x, y, z }
+        Self { x, y, z }
     }
 
     pub fn from_scalar(v: f64) -> Self
     {
-        Vec3 { x: v, y: v, z: v }
+        Self { x: v, y: v, z: v }
     }
 
-    pub fn random_in_unit_sphere() -> Self
+    pub fn random_unit_vector() -> Self
     {
-        loop
-        {
-            let vec = Self::random_from_bounds(-1.0, 1.0);
-            if vec.length_sq() <= 1.0
-            {
-                return vec;
-            }
+        let mut rng = rand::thread_rng();
+        let a: f64 = rng.gen_range(0.0, std::f64::consts::PI);
+        let z: f64 = rng.gen_range(-1.0, 1.0);
+        let r = (1.0 - z.powi(2)).sqrt();
+
+        Self {
+            x: r * a.cos(),
+            y: r * a.sin(),
+            z,
         }
     }
 
