@@ -156,6 +156,12 @@ fn refract(ray_in: Vec3, normal: Vec3, refractive_index_ratio: f64) -> Vec3
     ray_out_perp + ray_out_parallel
 }
 
+fn schlick(cos_theta: f64, refractive_index_ratio: f64) -> f64
+{
+    let r0 = ((1.0 - refractive_index_ratio) / (1.0 + refractive_index_ratio)).powi(2);
+    r0 + (1.0 - r0) * ((1.0 - cos_theta).powi(5))
+}
+
 struct Dielectric
 {
     refractive_index: f64,
@@ -184,9 +190,22 @@ impl Material for Dielectric
         };
 
         let unit_direction = ray_in.direction().into_unit_vec();
-        let refracted_direction =
-            refract(unit_direction, hit_record.normal, refractive_index_ratio);
-        let refracted_ray = Ray::new(hit_record.hit_point, refracted_direction);
+
+        let cos_theta = (-unit_direction.dot(hit_record.normal)).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+        let reflect_prob = schlick(cos_theta, refractive_index_ratio);
+        let mut rng = rand::thread_rng();
+        let direction = if refractive_index_ratio * sin_theta > 1.0
+            || rng.gen_range(0.0, 1.0) < reflect_prob
+        {
+            reflect(unit_direction, hit_record.normal)
+        }
+        else
+        {
+            refract(unit_direction, hit_record.normal, refractive_index_ratio)
+        };
+
+        let refracted_ray = Ray::new(hit_record.hit_point, direction);
 
         (Some(refracted_ray), attenuation)
     }
@@ -397,9 +416,9 @@ fn main()
 
     // World
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_sphere_center = Rc::new(Dielectric::new(1.5));
+    let material_sphere_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let material_sphere_left = Rc::new(Dielectric::new(1.5));
-    let material_sphere_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
+    let material_sphere_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
     let mut world = HittableList::new();
     world.add(Rc::new(Sphere::new(
@@ -415,6 +434,11 @@ fn main()
     world.add(Rc::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
+        material_sphere_left.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.4,
         material_sphere_left,
     )));
     world.add(Rc::new(Sphere::new(
