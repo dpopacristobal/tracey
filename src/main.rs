@@ -103,6 +103,42 @@ impl Material for Lambertian
     }
 }
 
+fn reflect(v: Vec3, n: Vec3) -> Vec3
+{
+    v - n.mul_scalar(2.0 * v.dot(n))
+}
+
+struct Metal
+{
+    albedo: Color,
+}
+
+impl Metal
+{
+    fn new(albedo: Color) -> Self
+    {
+        Self { albedo }
+    }
+}
+
+impl Material for Metal
+{
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
+    {
+        let reflected_direction = reflect(ray_in.direction().into_unit_vec(), hit_record.normal);
+        let reflected_ray = Ray::new(hit_record.hit_point, reflected_direction);
+
+        // This is probably not how you do this and there is a much neater way
+        let mut ret: Option<Ray> = None;
+        if reflected_ray.direction().dot(hit_record.normal) > 0.0
+        {
+            ret = Some(reflected_ray);
+        }
+
+        (ret, self.albedo)
+    }
+}
+
 trait Hit
 {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -297,6 +333,8 @@ fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
 
 fn main()
 {
+    // Image
+
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
@@ -305,8 +343,12 @@ fn main()
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
+    // World
+
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_sphere = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_sphere_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_sphere_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_sphere_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
 
     let mut world = HittableList::new();
     world.add(Rc::new(Sphere::new(
@@ -317,12 +359,26 @@ fn main()
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, 0.0, -1.0),
         0.5,
-        material_sphere,
+        material_sphere_center,
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_sphere_left,
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_sphere_right,
     )));
 
-    let camera = Camera::new();
-    let mut rng = rand::thread_rng();
+    // Camera
 
+    let camera = Camera::new();
+
+    // Render
+
+    let mut rng = rand::thread_rng();
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut()
     {
         let mut pixel_color_accumulator = Color::from_scalar(0.0);
@@ -339,5 +395,6 @@ fn main()
         *pixel = image::Rgb(pixel_color.gamma_2_correct().into_rgb8());
     }
 
+    // Output Image
     image_buffer.save("rendered_image.png").unwrap();
 }
