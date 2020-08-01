@@ -36,17 +36,25 @@ struct HitRecord
 {
     hit_point: Point3,
     normal: Vec3,
+    material: Rc<dyn Material>,
     t: f64,
     front_face: bool,
 }
 
 impl HitRecord
 {
-    fn new(hit_point: Point3, normal: Vec3, t: f64, front_face: bool) -> Self
+    fn new(
+        hit_point: Point3,
+        normal: Vec3,
+        material: Rc<dyn Material>,
+        t: f64,
+        front_face: bool,
+    ) -> Self
     {
         Self {
             hit_point,
             normal,
+            material,
             t,
             front_face,
         }
@@ -66,9 +74,38 @@ impl HitRecord
     }
 }
 
+trait Material
+{
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color);
+}
+
+struct Lambertian
+{
+    albedo: Color,
+}
+
+impl Lambertian
+{
+    fn new(albedo: Color) -> Self
+    {
+        Self { albedo }
+    }
+}
+
+impl Material for Lambertian
+{
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
+    {
+        let scatter_direction = hit_record.normal + Vec3::random_unit_vector();
+        let scattered_ray = Ray::new(hit_record.hit_point, scatter_direction);
+
+        (Some(scattered_ray), self.albedo)
+    }
+}
+
 trait Hit
 {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool;
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
 struct HittableList
@@ -108,23 +145,23 @@ impl HittableList
 
 impl Hit for HittableList
 {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>
     {
-        let mut temp_hit_record =
-            HitRecord::new(Point3::from_scalar(0.0), Vec3::from_scalar(0.0), 0.0, false);
-        let mut is_hit = false;
+        let mut ret: Option<HitRecord> = None;
+
         let mut closest_so_far = t_max;
         for object in &self.objects
         {
-            if object.hit(ray, t_min, closest_so_far, &mut temp_hit_record)
+            let hit_result = object.hit(ray, t_min, closest_so_far);
+            if hit_result.is_some()
             {
-                is_hit = true;
-                closest_so_far = temp_hit_record.t;
-                *hit_record = temp_hit_record.clone();
+                let hit_record = hit_result.unwrap();
+                closest_so_far = hit_record.t;
+                ret = Some(hit_record);
             }
         }
 
-        is_hit
+        ret
     }
 }
 
@@ -132,20 +169,33 @@ struct Sphere
 {
     center: Point3,
     radius: f64,
+    material: Rc<dyn Material>,
 }
 
 impl Sphere
 {
-    fn new(center: Point3, radius: f64) -> Self
+    fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self
     {
-        Self { center, radius }
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
 impl Hit for Sphere
 {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>
     {
+        let mut hit_record = HitRecord::new(
+            Point3::from_scalar(0.0),
+            Vec3::from_scalar(0.0),
+            self.material.clone(),
+            0.0,
+            false,
+        );
+
         let oc = *ray.origin() - self.center;
         let a = ray.direction().length_sq();
         let half_b = oc.dot(*ray.direction());
@@ -162,7 +212,7 @@ impl Hit for Sphere
                 hit_record.hit_point = ray.at(hit_record.t);
                 let outward_normal = (hit_record.hit_point - self.center).div_scalar(self.radius);
                 hit_record.set_face_normal(ray, outward_normal);
-                return true;
+                return Some(hit_record);
             }
             temp = (-half_b + root) / a;
             if (temp < t_max) && (temp > t_min)
@@ -171,11 +221,11 @@ impl Hit for Sphere
                 hit_record.hit_point = ray.at(hit_record.t);
                 let outward_normal = (hit_record.hit_point - self.center).div_scalar(self.radius);
                 hit_record.set_face_normal(ray, outward_normal);
-                return true;
+                return Some(hit_record);
             }
         }
 
-        false
+        None
     }
 }
 
@@ -224,22 +274,24 @@ impl Camera
 
 fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
 {
-    let mut hit_record =
-        HitRecord::new(Point3::from_scalar(0.0), Vec3::from_scalar(0.0), 0.0, false);
     if depth <= 0
     {
         return Color::from_scalar(0.0);
     }
 
-    if world.hit(ray, 0.001, f64::INFINITY, &mut hit_record)
+    let hit_result = world.hit(ray, 0.001, f64::INFINITY);
+    if hit_result.is_some()
     {
-        let target = hit_record.hit_point + hit_record.normal + Vec3::random_unit_vector();
-        return ray_color(
-            Ray::new(hit_record.hit_point, target - hit_record.hit_point),
-            world,
-            depth - 1,
-        )
-        .mul_scalar(0.5);
+        let hit_record = hit_result.unwrap();
+
+        let (scatter_result, attenuation) = hit_record.material.scatter(ray, &hit_record);
+        if scatter_result.is_some()
+        {
+            let scatter_ray = scatter_result.unwrap();
+            return attenuation * ray_color(scatter_ray, world, depth - 1);
+        }
+
+        return Color::from_scalar(0.0);
     }
 
     let unit_direction = ray.direction().into_unit_vec();
@@ -257,9 +309,20 @@ fn main()
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_sphere = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+
     let mut world = HittableList::new();
-    world.add(Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_sphere,
+    )));
 
     let camera = Camera::new();
     let mut rng = rand::thread_rng();
