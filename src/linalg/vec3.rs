@@ -26,6 +26,18 @@ impl Vec3
         Self { x: v, y: v, z: v }
     }
 
+    pub fn random_in_unit_sphere() -> Self
+    {
+        loop
+        {
+            let vec = Self::random_from_bounds(-1.0, 1.0);
+            if vec.length_sq() <= 1.0
+            {
+                return vec;
+            }
+        }
+    }
+
     pub fn random_unit_vector() -> Self
     {
         let mut rng = rand::thread_rng();

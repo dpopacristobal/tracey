@@ -111,13 +111,17 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3
 struct Metal
 {
     albedo: Color,
+    fuzz_factor: f64,
 }
 
 impl Metal
 {
-    fn new(albedo: Color) -> Self
+    fn new(albedo: Color, fuzz_factor: f64) -> Self
     {
-        Self { albedo }
+        Self {
+            albedo,
+            fuzz_factor,
+        }
     }
 }
 
@@ -126,7 +130,10 @@ impl Material for Metal
     fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
     {
         let reflected_direction = reflect(ray_in.direction().into_unit_vec(), hit_record.normal);
-        let reflected_ray = Ray::new(hit_record.hit_point, reflected_direction);
+        let reflected_ray = Ray::new(
+            hit_record.hit_point,
+            reflected_direction + Vec3::random_in_unit_sphere().mul_scalar(self.fuzz_factor),
+        );
 
         // This is probably not how you do this and there is a much neater way
         let mut ret: Option<Ray> = None;
@@ -136,6 +143,52 @@ impl Material for Metal
         }
 
         (ret, self.albedo)
+    }
+}
+
+// Should add a description here about what the refractive index ratio actually means
+fn refract(ray_in: Vec3, normal: Vec3, refractive_index_ratio: f64) -> Vec3
+{
+    let cos_theta = -ray_in.dot(normal);
+    let ray_out_perp = (ray_in + normal.mul_scalar(cos_theta)).mul_scalar(refractive_index_ratio);
+    let ray_out_parallel = normal.mul_scalar(-((1.0 - ray_out_perp.length_sq()).abs()).sqrt());
+
+    ray_out_perp + ray_out_parallel
+}
+
+struct Dielectric
+{
+    refractive_index: f64,
+}
+
+impl Dielectric
+{
+    fn new(refractive_index: f64) -> Self
+    {
+        Self { refractive_index }
+    }
+}
+
+impl Material for Dielectric
+{
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
+    {
+        let attenuation = Color::from_scalar(1.0);
+        let refractive_index_ratio = if hit_record.front_face
+        {
+            1.0 / self.refractive_index
+        }
+        else
+        {
+            self.refractive_index
+        };
+
+        let unit_direction = ray_in.direction().into_unit_vec();
+        let refracted_direction =
+            refract(unit_direction, hit_record.normal, refractive_index_ratio);
+        let refracted_ray = Ray::new(hit_record.hit_point, refracted_direction);
+
+        (Some(refracted_ray), attenuation)
     }
 }
 
@@ -334,7 +387,6 @@ fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
 fn main()
 {
     // Image
-
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
@@ -344,11 +396,10 @@ fn main()
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
     // World
-
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_sphere_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_sphere_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
-    let material_sphere_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+    let material_sphere_center = Rc::new(Dielectric::new(1.5));
+    let material_sphere_left = Rc::new(Dielectric::new(1.5));
+    let material_sphere_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
     let mut world = HittableList::new();
     world.add(Rc::new(Sphere::new(
@@ -373,11 +424,9 @@ fn main()
     )));
 
     // Camera
-
     let camera = Camera::new();
 
     // Render
-
     let mut rng = rand::thread_rng();
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut()
     {
