@@ -94,7 +94,7 @@ impl Lambertian
 
 impl Material for Lambertian
 {
-    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
+    fn scatter(&self, _ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color)
     {
         let scatter_direction = hit_record.normal + Vec3::random_unit_vector();
         let scattered_ray = Ray::new(hit_record.hit_point, scatter_direction);
@@ -153,9 +153,8 @@ impl Hit for HittableList
         for object in &self.objects
         {
             let hit_result = object.hit(ray, t_min, closest_so_far);
-            if hit_result.is_some()
+            if let Some(hit_record) = hit_result
             {
-                let hit_record = hit_result.unwrap();
                 closest_so_far = hit_record.t;
                 ret = Some(hit_record);
             }
@@ -280,14 +279,11 @@ fn ray_color(ray: Ray, world: &HittableList, depth: i32) -> Color
     }
 
     let hit_result = world.hit(ray, 0.001, f64::INFINITY);
-    if hit_result.is_some()
+    if let Some(hit_record) = hit_result
     {
-        let hit_record = hit_result.unwrap();
-
         let (scatter_result, attenuation) = hit_record.material.scatter(ray, &hit_record);
-        if scatter_result.is_some()
+        if let Some(scatter_ray) = scatter_result
         {
-            let scatter_ray = scatter_result.unwrap();
             return attenuation * ray_color(scatter_ray, world, depth - 1);
         }
 
