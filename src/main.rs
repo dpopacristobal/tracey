@@ -346,20 +346,26 @@ struct Camera
 
 impl Camera
 {
-    fn new() -> Self
+    fn new(
+        look_from: Point3,
+        look_at: Point3,
+        up_direction: Vec3,
+        vertical_fov: f64,
+        aspect_ratio: f64,
+    ) -> Self
     {
-        let aspect_ratio = 16.0 / 9.0;
-        let viewport_height = 2.0;
+        let theta = degrees_to_radians(vertical_fov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
-        let focal_length = 1.0;
+        let w = (look_from - look_at).into_unit_vec();
+        let u = up_direction.cross(w).into_unit_vec();
+        let v = w.cross(u);
 
-        let origin = Point3::from_scalar(0.0);
-        let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-        let vertical = Vec3::new(0.0, viewport_height, 0.0);
-        let lower_left_corner = origin
-            - horizontal.div_scalar(2.0)
-            - vertical.div_scalar(2.0)
-            - Vec3::new(0.0, 0.0, focal_length);
+        let origin = look_from;
+        let horizontal = u.mul_scalar(viewport_width);
+        let vertical = v.mul_scalar(viewport_height);
+        let lower_left_corner = origin - horizontal.mul_scalar(0.5) - vertical.mul_scalar(0.5) - w;
 
         Camera {
             origin,
@@ -438,7 +444,7 @@ fn main()
     )));
     world.add(Rc::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
-        -0.4,
+        -0.45,
         material_sphere_left,
     )));
     world.add(Rc::new(Sphere::new(
@@ -448,7 +454,13 @@ fn main()
     )));
 
     // Camera
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        aspect_ratio,
+    );
 
     // Render
     let mut rng = rand::thread_rng();
