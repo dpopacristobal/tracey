@@ -342,6 +342,10 @@ struct Camera
     lower_left_corner: Point3,
     horizontal: Vec3,
     vertical: Vec3,
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+    lens_radius: f64,
 }
 
 impl Camera
@@ -352,35 +356,50 @@ impl Camera
         up_direction: Vec3,
         vertical_fov: f64,
         aspect_ratio: f64,
+        aperture: f64,
+        focus_dist: f64,
     ) -> Self
     {
         let theta = degrees_to_radians(vertical_fov);
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
+
         let w = (look_from - look_at).into_unit_vec();
         let u = up_direction.cross(w).into_unit_vec();
         let v = w.cross(u);
 
         let origin = look_from;
-        let horizontal = u.mul_scalar(viewport_width);
-        let vertical = v.mul_scalar(viewport_height);
-        let lower_left_corner = origin - horizontal.mul_scalar(0.5) - vertical.mul_scalar(0.5) - w;
+        let horizontal = u.mul_scalar(focus_dist * viewport_width);
+        let vertical = v.mul_scalar(focus_dist * viewport_height);
+        let lower_left_corner = origin
+            - horizontal.mul_scalar(0.5)
+            - vertical.mul_scalar(0.5)
+            - w.mul_scalar(focus_dist);
+        let lens_radius = aperture / 2.0;
 
         Camera {
             origin,
             lower_left_corner,
             horizontal,
             vertical,
+            u,
+            v,
+            w,
+            lens_radius,
         }
     }
 
-    fn get_ray(&self, u: f64, v: f64) -> Ray
+    fn get_ray(&self, s: f64, t: f64) -> Ray
     {
+        let ray = Vec3::random_in_unit_disk().mul_scalar(self.lens_radius);
+        let offset = self.u.mul_scalar(ray.x()) + self.v.mul_scalar(ray.y());
+
         Ray::new(
-            self.origin,
-            self.lower_left_corner + self.horizontal.mul_scalar(u) + self.vertical.mul_scalar(v)
-                - self.origin,
+            self.origin + offset,
+            self.lower_left_corner + self.horizontal.mul_scalar(s) + self.vertical.mul_scalar(t)
+                - self.origin
+                - offset,
         )
     }
 }
@@ -454,12 +473,20 @@ fn main()
     )));
 
     // Camera
+    let look_from = Point3::new(3.0, 3.0, 2.0);
+    let look_at = Point3::new(0.0, 0.0, -1.0);
+    let up_direction = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = (look_from - look_at).length();
+    let aperture = 2.0;
+
     let camera = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        90.0,
+        look_from,
+        look_at,
+        up_direction,
+        20.0,
         aspect_ratio,
+        aperture,
+        dist_to_focus,
     );
 
     // Render

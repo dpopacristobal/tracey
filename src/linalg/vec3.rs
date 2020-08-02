@@ -38,6 +38,21 @@ impl Vec3
         }
     }
 
+    pub fn random_in_unit_disk() -> Self
+    {
+        let mut rng = rand::thread_rng();
+        loop
+        {
+            let vec = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), 0.0);
+            if vec.length_sq() >= 1.0
+            {
+                continue;
+            }
+
+            return vec;
+        }
+    }
+
     pub fn random_unit_vector() -> Self
     {
         let mut rng = rand::thread_rng();
