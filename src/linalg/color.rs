@@ -4,42 +4,34 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, 
 use rand::Rng;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Color
-{
+pub struct Color {
     r: f64,
     g: f64,
     b: f64,
 }
 
-impl Color
-{
-    pub fn new(r: f64, g: f64, b: f64) -> Self
-    {
+impl Color {
+    pub fn new(r: f64, g: f64, b: f64) -> Self {
         Color { r, g, b }
     }
 
-    pub fn from_scalar(v: f64) -> Self
-    {
+    pub fn from_scalar(v: f64) -> Self {
         Color { r: v, g: v, b: v }
     }
 
-    pub fn r(self) -> f64
-    {
+    pub fn r(self) -> f64 {
         self.r
     }
 
-    pub fn g(self) -> f64
-    {
+    pub fn g(self) -> f64 {
         self.g
     }
 
-    pub fn b(self) -> f64
-    {
+    pub fn b(self) -> f64 {
         self.b
     }
 
-    pub fn add_scalar(self, rhs: f64) -> Self
-    {
+    pub fn add_scalar(self, rhs: f64) -> Self {
         Self {
             r: self.r + rhs,
             g: self.g + rhs,
@@ -47,8 +39,7 @@ impl Color
         }
     }
 
-    pub fn sub_scalar(self, rhs: f64) -> Self
-    {
+    pub fn sub_scalar(self, rhs: f64) -> Self {
         Self {
             r: self.r - rhs,
             g: self.g - rhs,
@@ -56,8 +47,7 @@ impl Color
         }
     }
 
-    pub fn mul_scalar(self, rhs: f64) -> Self
-    {
+    pub fn mul_scalar(self, rhs: f64) -> Self {
         Self {
             r: self.r * rhs,
             g: self.g * rhs,
@@ -65,8 +55,7 @@ impl Color
         }
     }
 
-    pub fn div_scalar(self, rhs: f64) -> Self
-    {
+    pub fn div_scalar(self, rhs: f64) -> Self {
         Self {
             r: self.r / rhs,
             g: self.g / rhs,
@@ -74,8 +63,7 @@ impl Color
         }
     }
 
-    pub fn random_from_bounds(low: f64, high: f64) -> Self
-    {
+    pub fn random_from_bounds(low: f64, high: f64) -> Self {
         let mut rng = rand::thread_rng();
         Self {
             r: rng.gen_range(low, high),
@@ -84,8 +72,7 @@ impl Color
         }
     }
 
-    pub fn into_rgb8(self) -> [u8; 3]
-    {
+    pub fn into_rgb8(self) -> [u8; 3] {
         let ir = (255.99 * self.r) as u8;
         let ig = (255.99 * self.g) as u8;
         let ib = (255.99 * self.b) as u8;
@@ -93,8 +80,7 @@ impl Color
         [ir, ig, ib]
     }
 
-    pub fn gamma_2_correct(self) -> Self
-    {
+    pub fn gamma_2_correct(self) -> Self {
         Self {
             r: self.r.sqrt(),
             g: self.g.sqrt(),
@@ -102,15 +88,13 @@ impl Color
         }
     }
 
-    pub fn accumulate_sample(&mut self, rhs: Self)
-    {
+    pub fn accumulate_sample(&mut self, rhs: Self) {
         self.r += rhs.r;
         self.g += rhs.g;
         self.b += rhs.b;
     }
 
-    pub fn average_samples(self, num_of_samples: i32) -> Self
-    {
+    pub fn average_samples(self, num_of_samples: i32) -> Self {
         let inverse = 1.0 / num_of_samples as f64;
 
         Self {
@@ -121,12 +105,10 @@ impl Color
     }
 }
 
-impl Add for Color
-{
+impl Add for Color {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self
-    {
+    fn add(self, rhs: Self) -> Self {
         Self {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
@@ -135,10 +117,8 @@ impl Add for Color
     }
 }
 
-impl AddAssign for Color
-{
-    fn add_assign(&mut self, rhs: Self)
-    {
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
         *self = Self {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
@@ -147,12 +127,10 @@ impl AddAssign for Color
     }
 }
 
-impl Sub for Color
-{
+impl Sub for Color {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self
-    {
+    fn sub(self, rhs: Self) -> Self {
         Self {
             r: self.r - rhs.r,
             g: self.g - rhs.g,
@@ -161,10 +139,8 @@ impl Sub for Color
     }
 }
 
-impl SubAssign for Color
-{
-    fn sub_assign(&mut self, rhs: Self)
-    {
+impl SubAssign for Color {
+    fn sub_assign(&mut self, rhs: Self) {
         *self = Self {
             r: self.r - rhs.r,
             g: self.g - rhs.g,
@@ -173,12 +149,10 @@ impl SubAssign for Color
     }
 }
 
-impl Mul for Color
-{
+impl Mul for Color {
     type Output = Self;
 
-    fn mul(self, rhs: Self) -> Self
-    {
+    fn mul(self, rhs: Self) -> Self {
         Self {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
@@ -187,10 +161,8 @@ impl Mul for Color
     }
 }
 
-impl MulAssign for Color
-{
-    fn mul_assign(&mut self, rhs: Self)
-    {
+impl MulAssign for Color {
+    fn mul_assign(&mut self, rhs: Self) {
         *self = Self {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
@@ -199,12 +171,10 @@ impl MulAssign for Color
     }
 }
 
-impl Div for Color
-{
+impl Div for Color {
     type Output = Self;
 
-    fn div(self, rhs: Self) -> Self
-    {
+    fn div(self, rhs: Self) -> Self {
         Self {
             r: self.r / rhs.r,
             g: self.g / rhs.g,
@@ -213,10 +183,8 @@ impl Div for Color
     }
 }
 
-impl DivAssign for Color
-{
-    fn div_assign(&mut self, rhs: Self)
-    {
+impl DivAssign for Color {
+    fn div_assign(&mut self, rhs: Self) {
         *self = Self {
             r: self.r / rhs.r,
             g: self.g / rhs.g,
@@ -225,14 +193,11 @@ impl DivAssign for Color
     }
 }
 
-impl Index<usize> for Color
-{
+impl Index<usize> for Color {
     type Output = f64;
 
-    fn index(&self, index: usize) -> &Self::Output
-    {
-        match index
-        {
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
             0 => &self.r,
             1 => &self.g,
             2 => &self.b,
@@ -241,12 +206,9 @@ impl Index<usize> for Color
     }
 }
 
-impl IndexMut<usize> for Color
-{
-    fn index_mut(&mut self, index: usize) -> &mut f64
-    {
-        match index
-        {
+impl IndexMut<usize> for Color {
+    fn index_mut(&mut self, index: usize) -> &mut f64 {
+        match index {
             0 => &mut self.r,
             1 => &mut self.g,
             2 => &mut self.b,
@@ -255,10 +217,8 @@ impl IndexMut<usize> for Color
     }
 }
 
-impl fmt::Display for Color
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
-    {
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let ir = (255.99 * self.r) as u8;
         let ig = (255.99 * self.g) as u8;
         let ib = (255.99 * self.b) as u8;
@@ -269,13 +229,11 @@ impl fmt::Display for Color
 
 // [TODO] Make testing more exhaustive by not having 0.0 in the tests,
 #[cfg(test)]
-mod test
-{
+mod test {
     use super::Color;
 
     #[test]
-    fn color_constructor()
-    {
+    fn color_constructor() {
         let lhs = Color::from_scalar(0.0);
         let rhs = Color::new(0.0, 0.0, 0.0);
 
@@ -283,8 +241,7 @@ mod test
     }
 
     #[test]
-    fn color_value_access()
-    {
+    fn color_value_access() {
         let lhs = Color::new(0.0, 1.0, 2.0);
 
         assert_eq!(lhs.r(), 0.0);
@@ -295,7 +252,7 @@ mod test
         assert_eq!(lhs[1], 1.0);
         assert_eq!(lhs[2], 2.0);
 
-        let mut lhs = Color::new(0.0, 1.0, 2.0);
+        let lhs = Color::new(0.0, 1.0, 2.0);
 
         assert_eq!(lhs.r(), 0.0);
         assert_eq!(lhs.g(), 1.0);
@@ -311,8 +268,7 @@ mod test
     }
 
     #[test]
-    fn color_add()
-    {
+    fn color_add() {
         let lhs = Color::new(0.0, 1.0, 2.0);
         let rhs = Color::new(0.0, 1.0, 2.0);
         assert_eq!(
@@ -348,8 +304,7 @@ mod test
     }
 
     #[test]
-    fn color_sub()
-    {
+    fn color_sub() {
         let lhs = Color::new(0.0, 1.0, 2.0);
         let rhs = Color::new(0.0, 1.0, 2.0);
         assert_eq!(
@@ -385,8 +340,7 @@ mod test
     }
 
     #[test]
-    fn color_mul()
-    {
+    fn color_mul() {
         let lhs = Color::new(0.0, 1.0, 2.0);
         let rhs = Color::new(3.0, 3.0, 3.0);
         assert_eq!(
@@ -422,8 +376,7 @@ mod test
     }
 
     #[test]
-    fn color_div()
-    {
+    fn color_div() {
         let lhs = Color::new(0.0, 1.0, 2.0);
         let rhs = Color::new(1.0, 2.0, 4.0);
         assert_eq!(
