@@ -1,13 +1,11 @@
-extern crate rand;
-
 use rand::Rng;
 
-use crate::hittables::common::HitRecord;
+use crate::hittables::HitRecord;
 use crate::linalg::color::Color;
 use crate::linalg::ray::Ray;
-use crate::materials::common::Material;
+use crate::materials::Material;
 
-use super::utils::{reflect, refract, schlick};
+use super::{reflect, refract, schlick};
 
 pub struct Dielectric {
     refractive_index: f64,

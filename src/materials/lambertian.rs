@@ -1,8 +1,8 @@
-use crate::hittables::common::HitRecord;
+use crate::hittables::HitRecord;
 use crate::linalg::color::Color;
 use crate::linalg::ray::Ray;
 use crate::linalg::vec3::Vec3;
-use crate::materials::common::Material;
+use crate::materials::Material;
 
 pub struct Lambertian {
     albedo: Color,

@@ -1,10 +1,10 @@
-use crate::hittables::common::HitRecord;
-use crate::linalg::color::Color;
-use crate::linalg::ray::Ray;
-use crate::linalg::vec3::Vec3;
-use crate::materials::common::Material;
+use crate::hittables::HitRecord;
+use crate::linalg::Color;
+use crate::linalg::Ray;
+use crate::linalg::Vec3;
+use crate::materials::Material;
 
-use super::utils::reflect;
+use super::reflect;
 
 pub struct Metal {
     albedo: Color,

@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::linalg::ray::Ray;
 
-use super::common::{Hit, HitRecord};
+use super::{Hit, HitRecord};
 
 #[derive(Default)]
 pub struct World {

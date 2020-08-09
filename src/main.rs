@@ -1,18 +1,15 @@
 use std::rc::Rc;
 
-extern crate image;
-extern crate rand;
-
 use rand::Rng;
 
 extern crate rey_skytracer;
 
-use rey_skytracer::camera::camera::Camera;
-use rey_skytracer::hittables::{common::Hit, sphere::Sphere, world::World};
-use rey_skytracer::linalg::color::Color;
-use rey_skytracer::linalg::ray::Ray;
-use rey_skytracer::linalg::vec3::{Point3, Vec3};
-use rey_skytracer::materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
+use rey_skytracer::camera::Camera;
+use rey_skytracer::hittables::{Hit, Sphere, World};
+use rey_skytracer::linalg::Color;
+use rey_skytracer::linalg::Ray;
+use rey_skytracer::linalg::{Point3, Vec3};
+use rey_skytracer::materials::{Dielectric, Lambertian, Metal};
 
 fn ray_color(ray: Ray, world: &World, depth: i32) -> Color {
     if depth <= 0 {
@@ -46,8 +43,8 @@ fn gen_random_scene() -> World {
     world.add(ground_sphere);
 
     let mut rng = rand::thread_rng();
-    for a in -5..5 {
-        for b in -5..5 {
+    for a in -11..11 {
+        for b in -11..11 {
             let material_choice_prob = rng.gen_range(0.0, 1.0);
             let center = Point3::new(
                 a as f64 + 0.9 * rng.gen_range(0.0, 1.0),

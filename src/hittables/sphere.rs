@@ -2,14 +2,14 @@ use std::rc::Rc;
 
 use crate::linalg::ray::Ray;
 use crate::linalg::vec3::{Point3, Vec3};
-use crate::materials::common::Material;
+use crate::materials::Material;
 
-use super::common::{Hit, HitRecord};
+use super::{Hit, HitRecord};
 
 pub struct Sphere {
-    pub center: Point3,
-    pub radius: f64,
-    pub material: Rc<dyn Material>,
+    center: Point3,
+    radius: f64,
+    material: Rc<dyn Material>,
 }
 
 impl Sphere {
