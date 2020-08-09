@@ -7,3 +7,4 @@ pub mod camera;
 pub mod hittables;
 pub mod linalg;
 pub mod materials;
+pub mod render;
