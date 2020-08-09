@@ -100,7 +100,7 @@ fn gen_random_scene() -> World {
     world
 }
 
-fn main() {
+fn render() {
     // Image
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1920;
@@ -148,4 +148,8 @@ fn main() {
 
     // Output Image
     image_buffer.save("rendered_image.png").unwrap();
+}
+
+fn main() {
+    render();
 }
