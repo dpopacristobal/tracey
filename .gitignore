@@ -1,3 +1,8 @@
+# Build
 /target
+
+# Output
 rendered_image.png
+
+# IDEs
 .vscode/
