@@ -13,7 +13,7 @@ use rey_skytracer::materials::{Dielectric, Lambertian, Metal};
 
 fn ray_color(ray: Ray, world: &World, depth: i32) -> Color {
     if depth <= 0 {
-        return Color::from_scalar(0.0);
+        return Color::default();
     }
 
     let hit_result = world.hit(ray, 0.001, f64::INFINITY);
@@ -23,7 +23,7 @@ fn ray_color(ray: Ray, world: &World, depth: i32) -> Color {
             return attenuation * ray_color(scatter_ray, world, depth - 1);
         }
 
-        return Color::from_scalar(0.0);
+        return Color::default();
     }
 
     let unit_direction = ray.direction().into_unit_vec();
@@ -133,7 +133,7 @@ fn main() {
     // Render
     let mut rng = rand::thread_rng();
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut() {
-        let mut pixel_color_accumulator = Color::from_scalar(0.0);
+        let mut pixel_color_accumulator = Color::default();
         for _ in 0..samples_per_pixel {
             let u = (i as f64 + rng.gen_range(0.0, 1.0)) / (image_width - 1) as f64;
             let v =

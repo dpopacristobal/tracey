@@ -138,7 +138,17 @@ impl Vec3 {
     }
 
     pub fn into_color(self) -> Color {
-        Color::new(self.x(), self.y(), self.z())
+        Color::new(self.x, self.y, self.z)
+    }
+}
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 }
 

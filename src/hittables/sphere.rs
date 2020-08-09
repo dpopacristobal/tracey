@@ -25,8 +25,8 @@ impl Sphere {
 impl Hit for Sphere {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record = HitRecord::new(
-            Point3::from_scalar(0.0),
-            Vec3::from_scalar(0.0),
+            Point3::default(),
+            Vec3::default(),
             self.material.clone(),
             0.0,
             false,

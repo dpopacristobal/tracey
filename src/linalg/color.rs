@@ -105,6 +105,16 @@ impl Color {
     }
 }
 
+impl Default for Color {
+    fn default() -> Self {
+        Self {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+        }
+    }
+}
+
 impl Add for Color {
     type Output = Self;
 
