@@ -10,7 +10,7 @@ use crate::linalg::Ray;
 use crate::linalg::{Point3, Vec3};
 use crate::materials::{Dielectric, Lambertian, Metal};
 
-fn ray_color(ray: Ray, world: Arc<World>, depth: i32) -> Color {
+fn ray_color(ray: Ray, world: &World, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
@@ -30,7 +30,7 @@ fn ray_color(ray: Ray, world: Arc<World>, depth: i32) -> Color {
     Color::from_scalar(1.0).mul_scalar(1.0 - t) + Color::new(0.5, 0.7, 1.0).mul_scalar(t)
 }
 
-fn gen_random_scene() -> World {
+pub fn gen_random_scene() -> World {
     let mut world = World::default();
 
     let ground_material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
@@ -42,8 +42,8 @@ fn gen_random_scene() -> World {
     world.add(ground_sphere);
 
     let mut rng = rand::thread_rng();
-    for a in -11..11 {
-        for b in -11..11 {
+    for a in -5..5 {
+        for b in -5..5 {
             let material_choice_prob = rng.gen_range(0.0, 1.0);
             let center = Point3::new(
                 a as f64 + 0.9 * rng.gen_range(0.0, 1.0),
@@ -99,18 +99,12 @@ fn gen_random_scene() -> World {
     world
 }
 
-pub fn render() {
-    // Image
+pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let samples_per_pixel = 1;
     let max_depth = 50;
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
-
-    // World
-    let world = Arc::new(gen_random_scene());
 
     // Camera
     let look_from = Point3::new(13.0, 2.0, 3.0);
@@ -132,6 +126,7 @@ pub fn render() {
     // Render
     // TODO(dnlpc): Explain better what this is actually doing.
     let mut pixels: Vec<(u32, u32, &mut image::Rgb<u8>)> = Vec::new();
+    pixels.reserve((image_width * image_height) as usize);
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut() {
         pixels.push((i, j, pixel));
     }
@@ -144,7 +139,7 @@ pub fn render() {
             let v =
                 ((image_height - *j) as f64 + rng.gen_range(0.0, 1.0)) / (image_height - 1) as f64;
             let ray = camera.get_ray(u, v);
-            pixel_color_accumulator.accumulate_sample(ray_color(ray, world.clone(), max_depth));
+            pixel_color_accumulator.accumulate_sample(ray_color(ray, &world, max_depth));
         }
 
         let pixel_color: Color = pixel_color_accumulator.average_samples(samples_per_pixel);

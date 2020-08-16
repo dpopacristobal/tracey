@@ -1,7 +1,7 @@
 extern crate rey_skytracer;
 
-use rey_skytracer::render::render;
+use rey_skytracer::render::{gen_random_scene, render};
 
 fn main() {
-    render();
+    render(&gen_random_scene(), 1280, 20);
 }
