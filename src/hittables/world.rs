@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::linalg::ray::Ray;
 
@@ -6,11 +6,11 @@ use super::{Hit, HitRecord};
 
 #[derive(Default)]
 pub struct World {
-    objects: Vec<Rc<dyn Hit>>,
+    objects: Vec<Arc<dyn Hit>>,
 }
 
 impl World {
-    pub fn from_hittable(object: Rc<dyn Hit>) -> Self {
+    pub fn from_hittable(object: Arc<dyn Hit>) -> Self {
         Self {
             objects: vec![object.clone()],
         }
@@ -20,7 +20,7 @@ impl World {
         self.objects.clear();
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hit>) {
+    pub fn add(&mut self, object: Arc<dyn Hit>) {
         self.objects.push(object);
     }
 }
