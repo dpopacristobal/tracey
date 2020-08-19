@@ -3,6 +3,8 @@
 /*
 List of things to do:
 
+- Add a DefaultHittable.
+- Replace rhs in function definitions with other.
 - Split the render.rs file into something that makes more sense.
 - Make a proper benchmark scene that combines a good number of samples per pixel.
 - Clean up the modules like camera, which should be its own module.

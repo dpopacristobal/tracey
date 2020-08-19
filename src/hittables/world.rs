@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::linalg::ray::Ray;
 
-use super::{Hit, HitRecord};
+use super::{BoundingBox, Hit, HitRecord};
 
 #[derive(Default)]
 pub struct World {
@@ -39,5 +39,24 @@ impl Hit for World {
         }
 
         ret
+    }
+
+    fn bounding_box(&self, t_min: f64, t_max: f64) -> Option<BoundingBox> {
+        if self.objects.is_empty() {
+            return None;
+        }
+
+        //TODO(dnlpc): Write this in a clearer way.
+        let bounding_box = self.objects[0].bounding_box(t_min, t_max);
+        bounding_box.as_ref()?;
+        let mut bounding_box = bounding_box.unwrap();
+        for object in &self.objects {
+            let local_bounding_box = object.bounding_box(t_min, t_max);
+            local_bounding_box.as_ref()?;
+            let local_bounding_box = local_bounding_box.unwrap();
+            bounding_box = bounding_box.combine(&local_bounding_box);
+        }
+
+        Some(bounding_box)
     }
 }

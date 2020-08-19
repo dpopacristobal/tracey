@@ -1,3 +1,4 @@
+pub use bounding_box::BoundingBox;
 pub use sphere::Sphere;
 pub use world::World;
 
@@ -22,6 +23,7 @@ pub struct HitRecord {
 
 pub trait Hit: Send + Sync {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self, t_min: f64, t_max: f64) -> Option<BoundingBox>;
 }
 
 impl HitRecord {

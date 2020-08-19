@@ -4,7 +4,7 @@ use crate::linalg::ray::Ray;
 use crate::linalg::vec3::{Point3, Vec3};
 use crate::materials::Material;
 
-use super::{Hit, HitRecord};
+use super::{BoundingBox, Hit, HitRecord};
 
 pub struct Sphere {
     center: Point3,
@@ -59,5 +59,12 @@ impl Hit for Sphere {
         }
 
         None
+    }
+
+    fn bounding_box(&self, _t_min: f64, _t_max: f64) -> Option<BoundingBox> {
+        Some(BoundingBox::new(
+            self.center - Vec3::from_scalar(self.radius),
+            self.center - Vec3::from_scalar(self.radius),
+        ))
     }
 }
