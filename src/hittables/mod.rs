@@ -1,6 +1,7 @@
 pub use sphere::Sphere;
 pub use world::World;
 
+mod bounding_box;
 pub mod sphere;
 pub mod world;
 
@@ -8,7 +9,7 @@ use std::sync::Arc;
 
 use crate::linalg::Ray;
 use crate::linalg::{Point3, Vec3};
-use crate::materials::Material;
+use crate::materials::{DefaultMaterial, Material};
 
 #[derive(Clone)]
 pub struct HitRecord {
@@ -46,6 +47,18 @@ impl HitRecord {
             self.normal = outward_normal;
         } else {
             self.normal = outward_normal.mul_scalar(-1.0);
+        }
+    }
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self {
+            hit_point: Point3::default(),
+            normal: Vec3::default(),
+            material: Arc::new(DefaultMaterial::default()),
+            t: 0.0,
+            front_face: false,
         }
     }
 }

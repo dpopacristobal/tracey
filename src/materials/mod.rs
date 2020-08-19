@@ -1,3 +1,4 @@
+pub use default::DefaultMaterial;
 pub use dielectric::Dielectric;
 pub use lambertian::Lambertian;
 pub use metal::Metal;
@@ -7,6 +8,7 @@ use crate::linalg::Color;
 use crate::linalg::Ray;
 use crate::linalg::Vec3;
 
+pub mod default;
 pub mod dielectric;
 pub mod lambertian;
 pub mod metal;
