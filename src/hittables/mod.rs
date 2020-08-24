@@ -1,8 +1,10 @@
 pub use bounding_box::BoundingBox;
+pub use bvh_node::BvhNode;
 pub use sphere::Sphere;
 pub use world::World;
 
 mod bounding_box;
+pub mod bvh_node;
 pub mod sphere;
 pub mod world;
 

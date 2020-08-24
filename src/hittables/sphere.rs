@@ -64,7 +64,7 @@ impl Hit for Sphere {
     fn bounding_box(&self, _t_min: f64, _t_max: f64) -> Option<BoundingBox> {
         Some(BoundingBox::new(
             self.center - Vec3::from_scalar(self.radius),
-            self.center - Vec3::from_scalar(self.radius),
+            self.center + Vec3::from_scalar(self.radius),
         ))
     }
 }

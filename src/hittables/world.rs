@@ -23,6 +23,14 @@ impl World {
     pub fn add(&mut self, object: Arc<dyn Hit>) {
         self.objects.push(object);
     }
+
+    pub fn objects(&self) -> &Vec<Arc<dyn Hit>> {
+        &self.objects
+    }
+
+    pub fn objects_mut(&mut self) -> &mut Vec<Arc<dyn Hit>> {
+        &mut self.objects
+    }
 }
 
 impl Hit for World {
@@ -46,17 +54,20 @@ impl Hit for World {
             return None;
         }
 
-        //TODO(dnlpc): Write this in a clearer way.
         let bounding_box = self.objects[0].bounding_box(t_min, t_max);
-        bounding_box.as_ref()?;
-        let mut bounding_box = bounding_box.unwrap();
-        for object in &self.objects {
-            let local_bounding_box = object.bounding_box(t_min, t_max);
-            local_bounding_box.as_ref()?;
-            let local_bounding_box = local_bounding_box.unwrap();
-            bounding_box = bounding_box.combine(&local_bounding_box);
-        }
+        if let Some(mut bounding_box) = bounding_box {
+            for object in &self.objects {
+                let local_bounding_box = object.bounding_box(t_min, t_max);
+                if let Some(local_bounding_box) = local_bounding_box {
+                    bounding_box = bounding_box.combine(&local_bounding_box);
+                } else {
+                    return None;
+                }
+            }
 
-        Some(bounding_box)
+            Some(bounding_box)
+        } else {
+            None
+        }
     }
 }

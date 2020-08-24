@@ -34,15 +34,26 @@ impl BoundingBox {
             max_corner,
         }
     }
+
+    pub fn min_corner(&self) -> Point3 {
+        self.min_corner
+    }
+
+    pub fn max_corner(&self) -> Point3 {
+        self.max_corner
+    }
 }
 
 impl Hit for BoundingBox {
     fn hit(&self, ray: Ray, mut t_min: f64, mut t_max: f64) -> Option<HitRecord> {
         for idx in 0..3 {
-            let first_solution = (self.min_corner[idx] - ray.origin()[idx]) / ray.direction()[idx];
-            let second_solution = (self.min_corner[idx] - ray.origin()[idx]) / ray.direction()[idx];
-            let t_min_local = first_solution.min(second_solution);
-            let t_max_local = first_solution.max(second_solution);
+            let inv_direction = 1.0 / ray.direction()[idx];
+            let mut t_min_local = (self.min_corner[idx] - ray.origin()[idx]) * inv_direction;
+            let mut t_max_local = (self.max_corner[idx] - ray.origin()[idx]) * inv_direction;
+
+            if inv_direction < 0.0 {
+                std::mem::swap(&mut t_min_local, &mut t_max_local);
+            }
 
             t_min = t_min.max(t_min_local);
             t_max = t_max.min(t_max_local);

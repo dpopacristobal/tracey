@@ -4,7 +4,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{Hit, Sphere, World};
+use crate::hittables::{BvhNode, Hit, Sphere, World};
 use crate::linalg::Color;
 use crate::linalg::Ray;
 use crate::linalg::{Point3, Vec3};
@@ -95,6 +95,10 @@ pub fn gen_random_scene() -> World {
         1.0,
         dielectric_mat,
     )));
+
+    let bvh_node = BvhNode::from_world(&mut world, 0.0, 1.0);
+    let mut world = World::default();
+    world.add(Arc::new(bvh_node));
 
     world
 }
