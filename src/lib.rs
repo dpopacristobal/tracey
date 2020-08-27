@@ -3,8 +3,12 @@
 /*
 List of things to do:
 
+- Add lights.
+- Add a triangle reader.
+- Add support for triangle meshes.
 - Add a DefaultHittable.
 - Replace rhs in function definitions with other.
+- Isolate away the part that works on outputting an image.
 - Split the render.rs file into something that makes more sense.
 - Make a proper benchmark scene that combines a good number of samples per pixel.
 - Clean up the modules like camera, which should be its own module.
