@@ -1,7 +1,5 @@
 use crate::hittables::HitRecord;
-use crate::linalg::Color;
-use crate::linalg::Ray;
-use crate::linalg::Vec3;
+use crate::linalg::{Color, Ray, Vec3};
 use crate::materials::Material;
 
 use super::reflect;

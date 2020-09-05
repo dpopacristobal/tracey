@@ -3,8 +3,7 @@
 /*
 List of things to do:
 
-- Add lights.
-- Add a triangle reader.
+- Add rectangles.
 - Add support for triangle meshes.
 - Add a DefaultHittable.
 - Replace rhs in function definitions with other.

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use std::sync::Arc;
 
 use super::{BoundingBox, Hit, HitRecord, World};
-use crate::linalg::ray::Ray;
+use crate::linalg::Ray;
 
 // Could we replace this and just use generics with traits?
 fn b_box_compare(hittable_a: Arc<dyn Hit>, hittable_b: Arc<dyn Hit>, axis: i32) -> Ordering {

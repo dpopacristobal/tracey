@@ -1,5 +1,4 @@
-use crate::linalg::Ray;
-use crate::linalg::{Point3, Vec3};
+use crate::linalg::{Point3, Ray, Vec3};
 
 pub struct Camera {
     origin: Point3,

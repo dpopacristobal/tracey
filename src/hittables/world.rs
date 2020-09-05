@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::linalg::ray::Ray;
+use crate::linalg::Ray;
 
 use super::{BoundingBox, Hit, HitRecord};
 

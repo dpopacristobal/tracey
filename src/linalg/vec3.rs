@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, 
 
 use rand::Rng;
 
-use super::color::Color;
+use super::Color;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {

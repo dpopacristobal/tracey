@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use crate::linalg::ray::Ray;
-use crate::linalg::vec3::{Point3, Vec3};
+use crate::linalg::{Point3, Ray, Vec3};
 use crate::materials::Material;
 
 use super::{BoundingBox, Hit, HitRecord};

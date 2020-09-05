@@ -1,8 +1,7 @@
 use rand::Rng;
 
 use crate::hittables::HitRecord;
-use crate::linalg::color::Color;
-use crate::linalg::ray::Ray;
+use crate::linalg::{Color, Ray};
 use crate::materials::Material;
 
 use super::{reflect, refract, schlick};

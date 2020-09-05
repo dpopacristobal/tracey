@@ -5,29 +5,26 @@ use rayon::prelude::*;
 
 use crate::camera::Camera;
 use crate::hittables::{BvhNode, Hit, Sphere, World};
-use crate::linalg::Color;
-use crate::linalg::Ray;
-use crate::linalg::{Point3, Vec3};
-use crate::materials::{Dielectric, Lambertian, Metal};
+use crate::linalg::{Color, Point3, Ray, Vec3};
+use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 
-fn ray_color(ray: Ray, world: &World, depth: i32) -> Color {
+fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
 
     let hit_result = world.hit(ray, 0.001, f64::INFINITY);
     if let Some(hit_record) = hit_result {
+        let emitted_color = hit_record.material.emit(0.0, 0.0, hit_record.hit_point);
         let (scatter_result, attenuation) = hit_record.material.scatter(ray, &hit_record);
         if let Some(scatter_ray) = scatter_result {
-            return attenuation * ray_color(scatter_ray, world, depth - 1);
+            emitted_color + attenuation * ray_color(scatter_ray, background, world, depth - 1)
+        } else {
+            emitted_color
         }
-
-        return Color::default();
+    } else {
+        background
     }
-
-    let unit_direction = ray.direction().into_unit_vec();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    Color::from_scalar(1.0).mul_scalar(1.0 - t) + Color::new(0.5, 0.7, 1.0).mul_scalar(t)
 }
 
 pub fn gen_random_scene() -> World {
@@ -89,11 +86,11 @@ pub fn gen_random_scene() -> World {
         metal_mat,
     )));
 
-    let dielectric_mat = Arc::new(Dielectric::new(1.5));
+    let diffuse_light_mat = Arc::new(DiffuseLight::new(Color::new(4.0, 4.0, 4.0)));
     world.add(Arc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
         1.0,
-        dielectric_mat,
+        diffuse_light_mat,
     )));
 
     let bvh_node = BvhNode::from_world(&mut world, 0.0, 1.0);
@@ -127,6 +124,8 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
         dist_to_focus,
     );
 
+    let background = Color::new(0.0, 0.0, 0.0);
+
     // Render
     // TODO(dnlpc): Explain better what this is actually doing.
     let mut pixels: Vec<(u32, u32, &mut image::Rgb<u8>)> = Vec::new();
@@ -143,7 +142,8 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
             let v =
                 ((image_height - *j) as f64 + rng.gen_range(0.0, 1.0)) / (image_height - 1) as f64;
             let ray = camera.get_ray(u, v);
-            pixel_color_accumulator.accumulate_sample(ray_color(ray, &world, max_depth));
+            pixel_color_accumulator
+                .accumulate_sample(ray_color(ray, background, &world, max_depth));
         }
 
         let pixel_color: Color = pixel_color_accumulator.average_samples(samples_per_pixel);

@@ -1,7 +1,5 @@
 use crate::hittables::HitRecord;
-use crate::linalg::color::Color;
-use crate::linalg::ray::Ray;
-use crate::linalg::vec3::Vec3;
+use crate::linalg::{Color, Ray, Vec3};
 use crate::materials::Material;
 
 pub struct Lambertian {

@@ -1,20 +1,24 @@
 pub use default::DefaultMaterial;
 pub use dielectric::Dielectric;
+pub use diffuse_light::DiffuseLight;
 pub use lambertian::Lambertian;
 pub use metal::Metal;
 
 use crate::hittables::HitRecord;
-use crate::linalg::Color;
-use crate::linalg::Ray;
-use crate::linalg::Vec3;
+use crate::linalg::{Color, Point3, Ray, Vec3};
 
 pub mod default;
 pub mod dielectric;
+pub mod diffuse_light;
 pub mod lambertian;
 pub mod metal;
 
 pub trait Material: Send + Sync {
     fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color);
+
+    fn emit(&self, _u: f64, _v: f64, _hit_point: Point3) -> Color {
+        Color::default()
+    }
 }
 
 pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {

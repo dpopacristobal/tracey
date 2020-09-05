@@ -10,8 +10,7 @@ pub mod world;
 
 use std::sync::Arc;
 
-use crate::linalg::Ray;
-use crate::linalg::{Point3, Vec3};
+use crate::linalg::{Point3, Ray, Vec3};
 use crate::materials::{DefaultMaterial, Material};
 
 #[derive(Clone)]

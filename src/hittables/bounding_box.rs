@@ -1,5 +1,4 @@
-use crate::linalg::ray::Ray;
-use crate::linalg::vec3::Point3;
+use crate::linalg::{Point3, Ray};
 
 use super::{Hit, HitRecord};
 
