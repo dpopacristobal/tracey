@@ -4,7 +4,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{BvhNode, Hit, Sphere, World};
+use crate::hittables::{BvhNode, Hit, Sphere, World, XYRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 
@@ -86,10 +86,20 @@ pub fn gen_random_scene() -> World {
         metal_mat,
     )));
 
-    let diffuse_light_mat = Arc::new(DiffuseLight::new(Color::new(4.0, 4.0, 4.0)));
+    let dielectric_mat = Arc::new(Dielectric::new(1.5));
     world.add(Arc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
         1.0,
+        dielectric_mat,
+    )));
+
+    let diffuse_light_mat = Arc::new(DiffuseLight::new(Color::new(4.0, 4.0, 4.0)));
+    world.add(Arc::new(XYRect::new(
+        0.0,
+        2.0,
+        0.0,
+        2.0,
+        0.0,
         diffuse_light_mat,
     )));
 
