@@ -4,7 +4,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{BvhNode, Hit, Sphere, World, XYRect};
+use crate::hittables::{BvhNode, Hit, Sphere, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 
