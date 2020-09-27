@@ -115,7 +115,7 @@ impl Hit for XZRect {
             t,
             false,
         );
-        hit_record.set_face_normal(ray, Vec3::new(0.0, 0.0, 1.0));
+        hit_record.set_face_normal(ray, Vec3::new(0.0, 1.0, 0.0));
         Some(hit_record)
     }
 
@@ -176,7 +176,7 @@ impl Hit for YZRect {
             t,
             false,
         );
-        hit_record.set_face_normal(ray, Vec3::new(0.0, 0.0, 1.0));
+        hit_record.set_face_normal(ray, Vec3::new(1.0, 0.0, 0.0));
         Some(hit_record)
     }
 

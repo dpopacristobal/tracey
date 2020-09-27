@@ -2,7 +2,7 @@
 /target
 
 # Output
-rendered_image.png
+out/
 
 # IDEs
 .vscode/

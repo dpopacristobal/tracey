@@ -28,82 +28,48 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
 }
 
 pub fn gen_random_scene() -> World {
-    let mut world = World::default();
+    let mut hittable_list = World::default();
 
-    let ground_material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    let ground_sphere = Arc::new(Sphere::new(
-        Point3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        ground_material,
-    ));
-    world.add(ground_sphere);
+    let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
+    let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
+    let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
+    let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
 
-    let mut rng = rand::thread_rng();
-    for a in -5..5 {
-        for b in -5..5 {
-            let material_choice_prob = rng.gen_range(0.0, 1.0);
-            let center = Point3::new(
-                a as f64 + 0.9 * rng.gen_range(0.0, 1.0),
-                0.2,
-                b as f64 + 0.9 * rng.gen_range(0.0, 1.0),
-            );
-
-            if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let lambertian_mat = Arc::new(Lambertian::new(Color::random_from_bounds(0.0, 1.0)));
-                let metal_mat = Arc::new(Metal::new(
-                    Color::random_from_bounds(0.5, 1.0),
-                    rng.gen_range(0.0, 0.5),
-                ));
-                let dielectric_mat = Arc::new(Dielectric::new(1.5));
-
-                // Lambertian sphere
-                if material_choice_prob < 0.6 {
-                    world.add(Arc::new(Sphere::new(center, 0.2, lambertian_mat)));
-                }
-                // Metal sphere
-                else if material_choice_prob < 0.9 {
-                    world.add(Arc::new(Sphere::new(center, 0.2, metal_mat)));
-                }
-                // Dielectric sphere
-                else {
-                    world.add(Arc::new(Sphere::new(center, 0.2, dielectric_mat)));
-                };
-            }
-        }
-    }
-
-    let lambertian_mat = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(-4.0, 1.0, 0.0),
-        1.0,
-        lambertian_mat,
+    hittable_list.add(Arc::new(YZRect::new(
+        0.0, 555.0, 0.0, 555.0, 555.0, red_mat,
+    )));
+    hittable_list.add(Arc::new(YZRect::new(
+        0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
+    )));
+    hittable_list.add(Arc::new(XZRect::new(
+        213.0, 343.0, 227.0, 332.0, 554.0, light_mat,
     )));
 
-    let metal_mat = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(4.0, 1.0, 0.0),
-        1.0,
-        metal_mat,
-    )));
-
-    let dielectric_mat = Arc::new(Dielectric::new(1.5));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(0.0, 1.0, 0.0),
-        1.0,
-        dielectric_mat,
-    )));
-
-    let diffuse_light_mat = Arc::new(DiffuseLight::new(Color::new(4.0, 4.0, 4.0)));
-    world.add(Arc::new(XYRect::new(
+    hittable_list.add(Arc::new(XZRect::new(
         0.0,
-        2.0,
+        555.0,
         0.0,
-        2.0,
+        555.0,
         0.0,
-        diffuse_light_mat,
+        white_mat.clone(),
     )));
 
-    let bvh_node = BvhNode::from_world(&mut world, 0.0, 1.0);
+    // Top
+    hittable_list.add(Arc::new(XZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white_mat.clone(),
+    )));
+
+    // Back
+    hittable_list.add(Arc::new(XYRect::new(
+        0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
+    )));
+
+    let bvh_node = BvhNode::from_world(&mut hittable_list, 0.0, 1.0);
     let mut world = World::default();
     world.add(Arc::new(bvh_node));
 
@@ -111,15 +77,16 @@ pub fn gen_random_scene() -> World {
 }
 
 pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
-    let aspect_ratio = 16.0 / 9.0;
+    // let aspect_ratio = 16.0 / 9.0;
+    let aspect_ratio = 1.0;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let max_depth = 50;
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
     // Camera
-    let look_from = Point3::new(13.0, 2.0, 3.0);
-    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_at = Point3::new(278.0, 278.0, 0.0);
     let up_direction = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
@@ -128,7 +95,7 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
         look_from,
         look_at,
         up_direction,
-        20.0,
+        40.0,
         aspect_ratio,
         aperture,
         dist_to_focus,
@@ -137,7 +104,6 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
     let background = Color::new(0.0, 0.0, 0.0);
 
     // Render
-    // TODO(dnlpc): Explain better what this is actually doing.
     let mut pixels: Vec<(u32, u32, &mut image::Rgb<u8>)> = Vec::new();
     pixels.reserve((image_width * image_height) as usize);
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut() {
@@ -161,5 +127,5 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
     });
 
     // Output Image
-    image_buffer.save("rendered_image.png").unwrap();
+    image_buffer.save("out/rendered_image.png").unwrap();
 }
