@@ -2,11 +2,13 @@ pub use axis_aligned_rects::{XYRect, XZRect, YZRect};
 pub use bounding_box::BoundingBox;
 pub use bvh_node::BvhNode;
 pub use sphere::Sphere;
+pub use triangle::Triangle;
 pub use world::World;
 
 mod bounding_box;
 pub mod bvh_node;
 pub mod sphere;
+pub mod triangle;
 pub mod world;
 
 // Do we actually want to export this or do we just want to do it for boxes?

@@ -4,7 +4,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{BvhNode, Hit, Sphere, World, XYRect, XZRect, YZRect};
+use crate::hittables::{BvhNode, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 
@@ -36,7 +36,12 @@ pub fn gen_random_scene() -> World {
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
 
     hittable_list.add(Arc::new(YZRect::new(
-        0.0, 555.0, 0.0, 555.0, 555.0, red_mat,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        red_mat.clone(),
     )));
     hittable_list.add(Arc::new(YZRect::new(
         0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
@@ -66,8 +71,21 @@ pub fn gen_random_scene() -> World {
 
     // Back
     hittable_list.add(Arc::new(XYRect::new(
-        0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white_mat.clone(),
     )));
+
+    // Test triangle
+    let tri_verts = [
+        Point3::new(177.5, 200.0, 400.0),
+        Point3::new(377.5, 200.0, 400.0),
+        Point3::new(277.5, 400.0, 400.0),
+    ];
+    hittable_list.add(Arc::new(Triangle::new(tri_verts, red_mat)));
 
     let bvh_node = BvhNode::from_world(&mut hittable_list, 0.0, 1.0);
     let mut world = World::default();
