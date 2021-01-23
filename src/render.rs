@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::Arc;
 
 use rand::Rng;
@@ -6,6 +7,7 @@ use rayon::prelude::*;
 use crate::camera::Camera;
 use crate::hittables::{BvhNode, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
+use crate::load_mesh::load_mesh;
 use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 
 fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
@@ -33,7 +35,9 @@ pub fn gen_random_scene() -> World {
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
+    let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
+    let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
 
     hittable_list.add(Arc::new(YZRect::new(
         0.0,
@@ -79,13 +83,10 @@ pub fn gen_random_scene() -> World {
         white_mat.clone(),
     )));
 
-    // Test triangle
-    let tri_verts = [
-        Point3::new(177.5, 200.0, 400.0),
-        Point3::new(377.5, 200.0, 400.0),
-        Point3::new(277.5, 400.0, 400.0),
-    ];
-    hittable_list.add(Arc::new(Triangle::new(tri_verts, red_mat)));
+    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), metal_mat);
+    if let Some(triangle_mesh) = triangle_mesh_opt {
+        hittable_list.add(Arc::new(triangle_mesh));
+    }
 
     let bvh_node = BvhNode::from_world(&mut hittable_list, 0.0, 1.0);
     let mut world = World::default();
@@ -103,8 +104,8 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
     // Camera
-    let look_from = Point3::new(278.0, 278.0, -800.0);
-    let look_at = Point3::new(278.0, 278.0, 0.0);
+    let look_from = Point3::new(277.5, 277.5, -800.0);
+    let look_at = Point3::new(277.5, 277.5, 0.0);
     let up_direction = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;

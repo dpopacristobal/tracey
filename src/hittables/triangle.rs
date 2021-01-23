@@ -71,6 +71,14 @@ impl Hit for Triangle {
             *min.z_mut() = vertex.z().min(min.z());
         }
 
+        *max.x_mut() = max.x() + 0.0001;
+        *max.y_mut() = max.y() + 0.0001;
+        *max.z_mut() = max.z() + 0.0001;
+
+        *min.x_mut() = min.x() - 0.0001;
+        *min.y_mut() = min.y() - 0.0001;
+        *min.z_mut() = min.z() - 0.0001;
+
         Some(BoundingBox::new(min, max))
     }
 }
