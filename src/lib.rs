@@ -27,4 +27,5 @@ pub mod hittables;
 pub mod linalg;
 pub mod load_mesh;
 pub mod materials;
+pub mod pdfs;
 pub mod render;

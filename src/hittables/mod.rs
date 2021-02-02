@@ -1,12 +1,14 @@
 pub use axis_aligned_rects::{XYRect, XZRect, YZRect};
 pub use bounding_box::BoundingBox;
 pub use bvh_node::BvhNode;
+pub use flip_face::FlipFace;
 pub use sphere::Sphere;
 pub use triangle::Triangle;
 pub use world::World;
 
 mod bounding_box;
 pub mod bvh_node;
+pub mod flip_face;
 pub mod sphere;
 pub mod triangle;
 pub mod world;

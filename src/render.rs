@@ -5,10 +5,12 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{BvhNode, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
+use crate::hittables::{BvhNode, FlipFace, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::load_mesh::load_mesh;
-use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
+use crate::pdfs::{CosinePDF, PDF};
+// use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
+use crate::materials::{DiffuseLight, Lambertian};
 
 fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
     if depth <= 0 {
@@ -16,11 +18,44 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
     }
 
     let hit_result = world.hit(ray, 0.001, f64::INFINITY);
-    if let Some(hit_record) = hit_result {
-        let emitted_color = hit_record.material.emit(0.0, 0.0, hit_record.hit_point);
-        let (scatter_result, attenuation) = hit_record.material.scatter(ray, &hit_record);
-        if let Some(scatter_ray) = scatter_result {
-            emitted_color + attenuation * ray_color(scatter_ray, background, world, depth - 1)
+    if let Some(mut hit_record) = hit_result {
+        let material = hit_record.material.clone();
+        let emitted_color = material.emit(0.0, 0.0, &mut hit_record);
+        let (scatter_result, attenuation, pdf) = hit_record.material.scatter(ray, &hit_record);
+        if let Some(_scatter_ray) = scatter_result {
+            let cosine_pdf = CosinePDF::new(hit_record.normal);
+            let scatter_ray2 = Ray::new(hit_record.hit_point, cosine_pdf.generate());
+
+            // let mut rng = rand::thread_rng();
+            // let x: f64 = rng.gen_range(213.0, 343.0);
+            // let z: f64 = rng.gen_range(227.0, 332.0);
+            // let on_light = Point3::new(x, 554.0, z);
+            // let mut to_light = on_light - hit_record.hit_point;
+            // let distance_sq = to_light.length_sq();
+            // to_light = to_light.into_unit_vec();
+
+            // if to_light.dot(hit_record.normal) < 0.0 {
+            //     return emitted_color;
+            // }
+
+            // let light_area = (343.0 - 213.0) * (332.0 - 227.0);
+            // let light_cosine = to_light.y().abs();
+            // if light_cosine < 0.000001 {
+            //     return emitted_color;
+            // }
+
+            // let pdf2 = distance_sq / (light_cosine * light_area);
+            // let scatter_ray2 = Ray::new(hit_record.hit_point, to_light);
+
+            let pdf2 = cosine_pdf.value(*scatter_ray2.direction());
+
+            emitted_color
+                + attenuation.mul_scalar(
+                    hit_record
+                        .material
+                        .scattering_pdf(ray, scatter_ray2, &hit_record)
+                        / pdf2,
+                ) * ray_color(scatter_ray2, background, world, depth - 1)
         } else {
             emitted_color
         }
@@ -37,7 +72,7 @@ pub fn gen_random_scene() -> World {
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
     let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
-    let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
+    // let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
 
     hittable_list.add(Arc::new(YZRect::new(
         0.0,
@@ -50,9 +85,9 @@ pub fn gen_random_scene() -> World {
     hittable_list.add(Arc::new(YZRect::new(
         0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
     )));
-    hittable_list.add(Arc::new(XZRect::new(
+    hittable_list.add(Arc::new(FlipFace::new(Arc::new(XZRect::new(
         213.0, 343.0, 227.0, 332.0, 554.0, light_mat,
-    )));
+    )))));
 
     hittable_list.add(Arc::new(XZRect::new(
         0.0,
@@ -83,7 +118,7 @@ pub fn gen_random_scene() -> World {
         white_mat.clone(),
     )));
 
-    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), metal_mat);
+    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), blue_mat);
     if let Some(triangle_mesh) = triangle_mesh_opt {
         hittable_list.add(Arc::new(triangle_mesh));
     }
@@ -96,7 +131,6 @@ pub fn gen_random_scene() -> World {
 }
 
 pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
-    // let aspect_ratio = 16.0 / 9.0;
     let aspect_ratio = 1.0;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let max_depth = 50;

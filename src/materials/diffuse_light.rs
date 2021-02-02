@@ -13,11 +13,11 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, _ray_in: Ray, _hit_record: &HitRecord) -> (Option<Ray>, Color) {
-        (None, Color::default())
-    }
-
-    fn emit(&self, _u: f64, _v: f64, _hit_point: Point3) -> Color {
-        self.color
+    fn emit(&self, _u: f64, _v: f64, hit_record: &mut HitRecord) -> Color {
+        if hit_record.front_face {
+            self.color
+        } else {
+            Color::default()
+        }
     }
 }

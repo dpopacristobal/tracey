@@ -1,23 +1,29 @@
 pub use default::DefaultMaterial;
-pub use dielectric::Dielectric;
+// pub use dielectric::Dielectric;
 pub use diffuse_light::DiffuseLight;
 pub use lambertian::Lambertian;
-pub use metal::Metal;
+// pub use metal::Metal;
 
 use crate::hittables::HitRecord;
 use crate::linalg::{Color, Point3, Ray, Vec3};
 
 pub mod default;
-pub mod dielectric;
+// pub mod dielectric;
 pub mod diffuse_light;
 pub mod lambertian;
-pub mod metal;
+// pub mod metal;
 
 pub trait Material: Send + Sync {
-    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color);
+    fn scatter(&self, _ray_in: Ray, _hit_record: &HitRecord) -> (Option<Ray>, Color, f64) {
+        (None, Color::default(), 0.0)
+    }
 
-    fn emit(&self, _u: f64, _v: f64, _hit_point: Point3) -> Color {
+    fn emit(&self, _u: f64, _v: f64, _hit_record: &mut HitRecord) -> Color {
         Color::default()
+    }
+
+    fn scattering_pdf(&self, _ray_in: Ray, _ray_scattered: Ray, _hit_record: &HitRecord) -> f64 {
+        0.0
     }
 }
 

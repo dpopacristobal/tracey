@@ -43,6 +43,15 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_hemisphere(normal: Self) -> Self {
+        let in_unit_sphere = Self::random_in_unit_sphere();
+        if in_unit_sphere.dot(normal) > 0.0 {
+            in_unit_sphere
+        } else {
+            in_unit_sphere.mul_scalar(-1.0)
+        }
+    }
+
     pub fn random_unit_vector() -> Self {
         let mut rng = rand::thread_rng();
         let a: f64 = rng.gen_range(0.0, std::f64::consts::PI);
@@ -54,6 +63,19 @@ impl Vec3 {
             y: r * a.sin(),
             z,
         }
+    }
+
+    pub fn random_cosine_dir() -> Self {
+        let mut rng = rand::thread_rng();
+        let r1: f64 = rng.gen_range(0.0, 1.0);
+        let r2: f64 = rng.gen_range(0.0, 1.0);
+        let z = (1.0 - r2).sqrt();
+
+        let phi = 2.0 * std::f64::consts::PI * r1;
+        let x = phi.cos() * r2.sqrt();
+        let y = phi.sin() * r2.sqrt();
+
+        Self { x, y, z }
     }
 
     pub fn x(self) -> f64 {
