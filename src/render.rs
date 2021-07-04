@@ -8,11 +8,11 @@ use crate::camera::Camera;
 use crate::hittables::{BvhNode, FlipFace, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::load_mesh::load_mesh;
-use crate::pdfs::{CosinePDF, PDF};
+use crate::pdfs::{CosinePDF, HittablePDF, MixturePDF, PDF};
 // use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use crate::materials::{DiffuseLight, Lambertian};
 
-fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
+fn ray_color(ray: Ray, background: Color, world: &World, light: Arc<dyn Hit>, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
@@ -23,8 +23,15 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
         let emitted_color = material.emit(0.0, 0.0, &mut hit_record);
         let (scatter_result, attenuation, pdf) = hit_record.material.scatter(ray, &hit_record);
         if let Some(_scatter_ray) = scatter_result {
-            let cosine_pdf = CosinePDF::new(hit_record.normal);
-            let scatter_ray2 = Ray::new(hit_record.hit_point, cosine_pdf.generate());
+            // let cosine_pdf = CosinePDF::new(hit_record.normal);
+            // let scatter_ray2 = Ray::new(hit_record.hit_point, cosine_pdf.generate());
+
+            let light_pdf: Arc<dyn PDF> =
+                Arc::new(HittablePDF::new(light.clone(), hit_record.hit_point));
+            let cosine_pdf: Arc<dyn PDF> = Arc::new(CosinePDF::new(hit_record.normal));
+            let mixture_pdf = MixturePDF::new([light_pdf, cosine_pdf]);
+
+            let scatter_ray2 = Ray::new(hit_record.hit_point, mixture_pdf.generate());
 
             // let mut rng = rand::thread_rng();
             // let x: f64 = rng.gen_range(213.0, 343.0);
@@ -47,7 +54,8 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
             // let pdf2 = distance_sq / (light_cosine * light_area);
             // let scatter_ray2 = Ray::new(hit_record.hit_point, to_light);
 
-            let pdf2 = cosine_pdf.value(*scatter_ray2.direction());
+            // let pdf2 = cosine_pdf.value(*scatter_ray2.direction());
+            let pdf2 = mixture_pdf.value(*scatter_ray2.direction());
 
             emitted_color
                 + attenuation.mul_scalar(
@@ -55,7 +63,7 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
                         .material
                         .scattering_pdf(ray, scatter_ray2, &hit_record)
                         / pdf2,
-                ) * ray_color(scatter_ray2, background, world, depth - 1)
+                ) * ray_color(scatter_ray2, background, world, light, depth - 1)
         } else {
             emitted_color
         }
@@ -64,8 +72,9 @@ fn ray_color(ray: Ray, background: Color, world: &World, depth: i32) -> Color {
     }
 }
 
-pub fn gen_random_scene() -> World {
+pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
     let mut hittable_list = World::default();
+    let mut light_list = World::default();
 
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
@@ -85,8 +94,14 @@ pub fn gen_random_scene() -> World {
     hittable_list.add(Arc::new(YZRect::new(
         0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
     )));
+
     hittable_list.add(Arc::new(FlipFace::new(Arc::new(XZRect::new(
-        213.0, 343.0, 227.0, 332.0, 554.0, light_mat,
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        light_mat.clone(),
     )))));
 
     hittable_list.add(Arc::new(XZRect::new(
@@ -127,13 +142,15 @@ pub fn gen_random_scene() -> World {
     let mut world = World::default();
     world.add(Arc::new(bvh_node));
 
-    world
+    let light = Arc::new(XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light_mat));
+
+    (world, light)
 }
 
-pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
+pub fn render(world: &World, light: Arc<dyn Hit>, image_width: u32, samples_per_pixel: i32) {
     let aspect_ratio = 1.0;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let max_depth = 50;
+    let max_depth = 20;
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
@@ -171,8 +188,13 @@ pub fn render(world: &World, image_width: u32, samples_per_pixel: i32) {
             let v =
                 ((image_height - *j) as f64 + rng.gen_range(0.0, 1.0)) / (image_height - 1) as f64;
             let ray = camera.get_ray(u, v);
-            pixel_color_accumulator
-                .accumulate_sample(ray_color(ray, background, &world, max_depth));
+            pixel_color_accumulator.accumulate_sample(ray_color(
+                ray,
+                background,
+                world,
+                light.clone(),
+                max_depth,
+            ));
         }
 
         let pixel_color: Color = pixel_color_accumulator.average_samples(samples_per_pixel);

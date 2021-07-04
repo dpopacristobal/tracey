@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use rand::Rng;
+
 use crate::linalg::{Point3, Ray, Vec3};
 use crate::materials::Material;
 
@@ -124,6 +126,31 @@ impl Hit for XZRect {
             Point3::new(self.x_min, self.y - 0.0001, self.z_min),
             Point3::new(self.x_max, self.y + 0.0001, self.z_max),
         ))
+    }
+
+    fn pdf_value(&self, hit_point: Point3, direction: Vec3) -> f64 {
+        if let Some(hit_record) =
+            self.hit(Ray::new(hit_point, direction), 0.001, std::f64::INFINITY)
+        {
+            let area = (self.x_max - self.x_min) * (self.z_max - self.z_min);
+            let distance_sq = hit_record.t * hit_record.t * direction.length_sq();
+            let cos_theta = direction.dot(hit_record.normal).abs() / direction.length();
+
+            distance_sq / (cos_theta * area)
+        } else {
+            0.0
+        }
+    }
+
+    fn random(&self, origin: Vec3) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let rand_point = Point3::new(
+            rng.gen_range(self.x_min, self.x_max),
+            self.y,
+            rng.gen_range(self.z_min, self.z_max),
+        );
+
+        rand_point - origin
     }
 }
 

@@ -33,6 +33,12 @@ pub struct HitRecord {
 pub trait Hit: Send + Sync {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
     fn bounding_box(&self, t_min: f64, t_max: f64) -> Option<BoundingBox>;
+    fn pdf_value(&self, _hit_point: Point3, _direction: Vec3) -> f64 {
+        0.0
+    }
+    fn random(&self, _origin: Vec3) -> Vec3 {
+        Vec3::new(1.0, 0.0, 0.0)
+    }
 }
 
 impl HitRecord {
