@@ -1,6 +1,11 @@
 use crate::hittables::HitRecord;
-use crate::linalg::{Color, Ray, Vec3, ONB};
+use crate::linalg::{Color, Ray};
 use crate::materials::Material;
+use crate::pdfs::CosinePDF;
+
+use super::ScatterRecord;
+
+use std::sync::Arc;
 
 pub struct Lambertian {
     albedo: Color,
@@ -13,16 +18,12 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color, f64) {
-        let onb = ONB::new(hit_record.normal);
-        // let scatter_direction = hit_record.normal + Vec3::random_unit_vector();
-        // let scatter_direction = Vec3::random_in_hemisphere(hit_record.normal);
-        let scatter_direction = onb.local(Vec3::random_cosine_dir());
-        let scattered_ray = Ray::new(hit_record.hit_point, scatter_direction);
-        // let pdf = hit_record.normal.dot(*scattered_ray.direction()) / std::f64::consts::PI;
-        let pdf = onb.w().dot(*scattered_ray.direction()) / std::f64::consts::PI;
-
-        (Some(scattered_ray), self.albedo, pdf)
+    fn scatter(&self, _ray_in: Ray, hit_record: &HitRecord) -> Option<ScatterRecord> {
+        Some(ScatterRecord::new(
+            None,
+            Some(Arc::new(CosinePDF::new(hit_record.normal))),
+            self.albedo,
+        ))
     }
 
     fn scattering_pdf(&self, _ray_in: Ray, ray_scattered: Ray, hit_record: &HitRecord) -> f64 {

@@ -2,7 +2,7 @@ use crate::hittables::HitRecord;
 use crate::linalg::{Color, Ray, Vec3};
 use crate::materials::Material;
 
-use super::reflect;
+use super::{reflect, ScatterRecord};
 
 pub struct Metal {
     albedo: Color,
@@ -19,7 +19,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color) {
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> Option<ScatterRecord> {
         let reflected_direction = reflect(ray_in.direction().into_unit_vec(), hit_record.normal);
         let reflected_ray = Ray::new(
             hit_record.hit_point,
@@ -27,11 +27,11 @@ impl Material for Metal {
         );
 
         // This is probably not how you do this and there is a much neater way
-        let mut ret: Option<Ray> = None;
+        let mut ret: Option<ScatterRecord> = None;
         if reflected_ray.direction().dot(hit_record.normal) > 0.0 {
-            ret = Some(reflected_ray);
+            ret = Some(ScatterRecord::new(Some(reflected_ray), None, self.albedo));
         }
 
-        (ret, self.albedo)
+        ret
     }
 }

@@ -1,21 +1,40 @@
 pub use default::DefaultMaterial;
-// pub use dielectric::Dielectric;
+pub use dielectric::Dielectric;
 pub use diffuse_light::DiffuseLight;
 pub use lambertian::Lambertian;
-// pub use metal::Metal;
+pub use metal::Metal;
 
 use crate::hittables::HitRecord;
 use crate::linalg::{Color, Ray, Vec3};
+use crate::pdfs::PDF;
 
 pub mod default;
-// pub mod dielectric;
+pub mod dielectric;
 pub mod diffuse_light;
 pub mod lambertian;
-// pub mod metal;
+pub mod metal;
+
+use std::sync::Arc;
+
+pub struct ScatterRecord {
+    pub specular_ray: Option<Ray>,
+    pub pdf: Option<Arc<dyn PDF>>,
+    pub attenuation: Color,
+}
+
+impl ScatterRecord {
+    pub fn new(specular_ray: Option<Ray>, pdf: Option<Arc<dyn PDF>>, attenuation: Color) -> Self {
+        Self {
+            specular_ray,
+            pdf,
+            attenuation,
+        }
+    }
+}
 
 pub trait Material: Send + Sync {
-    fn scatter(&self, _ray_in: Ray, _hit_record: &HitRecord) -> (Option<Ray>, Color, f64) {
-        (None, Color::default(), 0.0)
+    fn scatter(&self, _ray_in: Ray, _hit_record: &HitRecord) -> Option<ScatterRecord> {
+        None
     }
 
     fn emit(&self, _u: f64, _v: f64, _hit_record: &mut HitRecord) -> Color {

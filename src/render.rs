@@ -8,9 +8,8 @@ use crate::camera::Camera;
 use crate::hittables::{BvhNode, FlipFace, Hit, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::load_mesh::load_mesh;
-use crate::pdfs::{CosinePDF, HittablePDF, MixturePDF, PDF};
-// use crate::materials::{Dielectric, DiffuseLight, Lambertian, Metal};
-use crate::materials::{DiffuseLight, Lambertian};
+use crate::materials::{DiffuseLight, Lambertian, Metal};
+use crate::pdfs::{HittablePDF, MixturePDF, PDF};
 
 fn ray_color(ray: Ray, background: Color, world: &World, light: Arc<dyn Hit>, depth: i32) -> Color {
     if depth <= 0 {
@@ -21,49 +20,27 @@ fn ray_color(ray: Ray, background: Color, world: &World, light: Arc<dyn Hit>, de
     if let Some(mut hit_record) = hit_result {
         let material = hit_record.material.clone();
         let emitted_color = material.emit(0.0, 0.0, &mut hit_record);
-        let (scatter_result, attenuation, _pdf) = hit_record.material.scatter(ray, &hit_record);
-        if let Some(_scatter_ray) = scatter_result {
-            // let cosine_pdf = CosinePDF::new(hit_record.normal);
-            // let scatter_ray2 = Ray::new(hit_record.hit_point, cosine_pdf.generate());
+        let scatter_record_opt = hit_record.material.scatter(ray, &hit_record);
+        if let Some(scatter_record) = scatter_record_opt {
+            if let Some(specular_ray) = scatter_record.specular_ray {
+                scatter_record.attenuation
+                    * ray_color(specular_ray, background, world, light, depth - 1)
+            } else {
+                let light_pdf: Arc<dyn PDF> =
+                    Arc::new(HittablePDF::new(light.clone(), hit_record.hit_point));
+                let mixture_pdf = MixturePDF::new([light_pdf, scatter_record.pdf.unwrap()]);
 
-            let light_pdf: Arc<dyn PDF> =
-                Arc::new(HittablePDF::new(light.clone(), hit_record.hit_point));
-            let cosine_pdf: Arc<dyn PDF> = Arc::new(CosinePDF::new(hit_record.normal));
-            let mixture_pdf = MixturePDF::new([light_pdf, cosine_pdf]);
+                let scatter_ray = Ray::new(hit_record.hit_point, mixture_pdf.generate());
+                let pdf_val = mixture_pdf.value(*scatter_ray.direction());
 
-            let scatter_ray2 = Ray::new(hit_record.hit_point, mixture_pdf.generate());
-
-            // let mut rng = rand::thread_rng();
-            // let x: f64 = rng.gen_range(213.0, 343.0);
-            // let z: f64 = rng.gen_range(227.0, 332.0);
-            // let on_light = Point3::new(x, 554.0, z);
-            // let mut to_light = on_light - hit_record.hit_point;
-            // let distance_sq = to_light.length_sq();
-            // to_light = to_light.into_unit_vec();
-
-            // if to_light.dot(hit_record.normal) < 0.0 {
-            //     return emitted_color;
-            // }
-
-            // let light_area = (343.0 - 213.0) * (332.0 - 227.0);
-            // let light_cosine = to_light.y().abs();
-            // if light_cosine < 0.000001 {
-            //     return emitted_color;
-            // }
-
-            // let pdf2 = distance_sq / (light_cosine * light_area);
-            // let scatter_ray2 = Ray::new(hit_record.hit_point, to_light);
-
-            // let pdf2 = cosine_pdf.value(*scatter_ray2.direction());
-            let pdf2 = mixture_pdf.value(*scatter_ray2.direction());
-
-            emitted_color
-                + attenuation.mul_scalar(
-                    hit_record
-                        .material
-                        .scattering_pdf(ray, scatter_ray2, &hit_record)
-                        / pdf2,
-                ) * ray_color(scatter_ray2, background, world, light, depth - 1)
+                emitted_color
+                    + scatter_record.attenuation.mul_scalar(
+                        hit_record
+                            .material
+                            .scattering_pdf(ray, scatter_ray, &hit_record)
+                            / pdf_val,
+                    ) * ray_color(scatter_ray, background, world, light, depth - 1)
+            }
         } else {
             emitted_color
         }
@@ -78,9 +55,9 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
-    let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
+    // let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
-    // let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
+    let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
 
     hittable_list.add(Arc::new(YZRect::new(
         0.0,
@@ -127,7 +104,7 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
         0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
     )));
 
-    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), blue_mat);
+    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), metal_mat);
     if let Some(triangle_mesh) = triangle_mesh_opt {
         hittable_list.add(Arc::new(triangle_mesh));
     }

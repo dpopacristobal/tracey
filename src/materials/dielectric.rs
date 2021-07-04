@@ -4,7 +4,7 @@ use crate::hittables::HitRecord;
 use crate::linalg::{Color, Ray};
 use crate::materials::Material;
 
-use super::{reflect, refract, schlick};
+use super::{reflect, refract, schlick, ScatterRecord};
 
 pub struct Dielectric {
     refractive_index: f64,
@@ -17,8 +17,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> (Option<Ray>, Color) {
-        let attenuation = Color::from_scalar(1.0);
+    fn scatter(&self, ray_in: Ray, hit_record: &HitRecord) -> Option<ScatterRecord> {
         let refractive_index_ratio = if hit_record.front_face {
             1.0 / self.refractive_index
         } else {
@@ -40,6 +39,10 @@ impl Material for Dielectric {
 
         let refracted_ray = Ray::new(hit_record.hit_point, direction);
 
-        (Some(refracted_ray), attenuation)
+        Some(ScatterRecord::new(
+            Some(refracted_ray),
+            None,
+            Color::from_scalar(1.0),
+        ))
     }
 }
