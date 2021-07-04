@@ -5,7 +5,7 @@ use rand::Rng;
 use rayon::prelude::*;
 
 use crate::camera::Camera;
-use crate::hittables::{BvhNode, FlipFace, Hit, Sphere, Triangle, World, XYRect, XZRect, YZRect};
+use crate::hittables::{BvhNode, FlipFace, Hit, World, XYRect, XZRect, YZRect};
 use crate::linalg::{Color, Point3, Ray, Vec3};
 use crate::load_mesh::load_mesh;
 use crate::pdfs::{CosinePDF, HittablePDF, MixturePDF, PDF};
@@ -21,7 +21,7 @@ fn ray_color(ray: Ray, background: Color, world: &World, light: Arc<dyn Hit>, de
     if let Some(mut hit_record) = hit_result {
         let material = hit_record.material.clone();
         let emitted_color = material.emit(0.0, 0.0, &mut hit_record);
-        let (scatter_result, attenuation, pdf) = hit_record.material.scatter(ray, &hit_record);
+        let (scatter_result, attenuation, _pdf) = hit_record.material.scatter(ray, &hit_record);
         if let Some(_scatter_ray) = scatter_result {
             // let cosine_pdf = CosinePDF::new(hit_record.normal);
             // let scatter_ray2 = Ray::new(hit_record.hit_point, cosine_pdf.generate());
@@ -74,7 +74,6 @@ fn ray_color(ray: Ray, background: Color, world: &World, light: Arc<dyn Hit>, de
 
 pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
     let mut hittable_list = World::default();
-    let mut light_list = World::default();
 
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
@@ -125,12 +124,7 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
 
     // Back
     hittable_list.add(Arc::new(XYRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        white_mat.clone(),
+        0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
     )));
 
     let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), blue_mat);

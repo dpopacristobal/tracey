@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::linalg::{Point3, Ray, Vec3};
+use crate::linalg::{Ray, Vec3};
 use crate::materials::Material;
 
 use super::{BoundingBox, Hit, HitRecord};
@@ -26,7 +26,7 @@ impl Triangle {
 }
 
 impl Hit for Triangle {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: Ray, _t_min: f64, _t_max: f64) -> Option<HitRecord> {
         let edge1 = self.vertices[1] - self.vertices[0];
         let edge2 = self.vertices[2] - self.vertices[0];
         let h = ray.direction().cross(edge2);

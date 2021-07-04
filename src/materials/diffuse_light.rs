@@ -1,5 +1,5 @@
 use crate::hittables::HitRecord;
-use crate::linalg::{Color, Point3, Ray};
+use crate::linalg::Color;
 use crate::materials::Material;
 
 pub struct DiffuseLight {

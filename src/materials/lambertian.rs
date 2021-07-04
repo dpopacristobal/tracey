@@ -25,7 +25,7 @@ impl Material for Lambertian {
         (Some(scattered_ray), self.albedo, pdf)
     }
 
-    fn scattering_pdf(&self, ray_in: Ray, ray_scattered: Ray, hit_record: &HitRecord) -> f64 {
+    fn scattering_pdf(&self, _ray_in: Ray, ray_scattered: Ray, hit_record: &HitRecord) -> f64 {
         let cos_theta = hit_record
             .normal
             .dot(ray_scattered.direction().into_unit_vec());

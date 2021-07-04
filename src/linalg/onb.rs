@@ -1,4 +1,4 @@
-use super::{Point3, Vec3};
+use super::Vec3;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ONB {

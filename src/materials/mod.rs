@@ -5,7 +5,7 @@ pub use lambertian::Lambertian;
 // pub use metal::Metal;
 
 use crate::hittables::HitRecord;
-use crate::linalg::{Color, Point3, Ray, Vec3};
+use crate::linalg::{Color, Ray, Vec3};
 
 pub mod default;
 // pub mod dielectric;
