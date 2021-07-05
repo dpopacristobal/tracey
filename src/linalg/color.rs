@@ -94,7 +94,7 @@ impl Color {
         self.b += rhs.b;
     }
 
-    pub fn average_samples(self, num_of_samples: i32) -> Self {
+    pub fn average_samples(self, num_of_samples: u32) -> Self {
         let inverse = 1.0 / num_of_samples as f64;
 
         Self {

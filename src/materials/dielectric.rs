@@ -36,7 +36,6 @@ impl Material for Dielectric {
             } else {
                 refract(unit_direction, hit_record.normal, refractive_index_ratio)
             };
-
         let refracted_ray = Ray::new(hit_record.hit_point, direction);
 
         Some(ScatterRecord::new(

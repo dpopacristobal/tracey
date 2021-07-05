@@ -118,7 +118,7 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
     (world, light)
 }
 
-pub fn render(world: &World, light: Arc<dyn Hit>, image_width: u32, samples_per_pixel: i32) {
+pub fn render(world: &World, light: Arc<dyn Hit>, image_width: u32, samples_per_pixel: u32) {
     let aspect_ratio = 1.0;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let max_depth = 20;
