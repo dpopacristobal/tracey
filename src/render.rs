@@ -55,9 +55,9 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
-    // let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
+    let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
-    let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
+    // let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
 
     hittable_list.add(Arc::new(YZRect::new(
         0.0,
@@ -104,7 +104,7 @@ pub fn gen_random_scene() -> (World, Arc<dyn Hit>) {
         0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
     )));
 
-    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), metal_mat);
+    let triangle_mesh_opt = load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), blue_mat);
     if let Some(triangle_mesh) = triangle_mesh_opt {
         hittable_list.add(Arc::new(triangle_mesh));
     }
