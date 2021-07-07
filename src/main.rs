@@ -1,6 +1,7 @@
 extern crate rey_skytracer;
 
-use rey_skytracer::render::{gen_random_scene, render};
+use rey_skytracer::render::render;
+use rey_skytracer::scene::{get_empty_cornell_box_scene, Scene};
 
 use clap::Clap;
 
@@ -20,6 +21,6 @@ struct TraceyArgs {
 fn main() {
     let args = TraceyArgs::parse();
 
-    let (world, light) = gen_random_scene();
-    render(&world, light, args.width, args.rays);
+    let scene = get_empty_cornell_box_scene();
+    render(args.width, args.rays, scene);
 }
