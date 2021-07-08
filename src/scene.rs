@@ -33,7 +33,7 @@ impl Scene {
     }
 }
 
-pub fn get_empty_cornell_box_scene() -> Scene {
+pub fn get_cornell_box_scene(objects: World) -> Scene {
     let aspect_ratio = 1.0;
 
     // Camera
@@ -62,6 +62,9 @@ pub fn get_empty_cornell_box_scene() -> Scene {
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
     let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
     let mut hittable_list = World::default();
+    for object in objects.objects() {
+        hittable_list.add(object.clone());
+    }
 
     hittable_list.add(Arc::new(YZRect::new(
         0.0,
