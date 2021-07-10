@@ -13,8 +13,8 @@ name = "rey_skytracer"
 path = "src/main.rs"
 
 [dependencies]
-clap = "3.0.0-beta.2"
 image = "0.23"
 obj-rs = "0.6"
 rand = "0.7.3"
 rayon = "1.1"
+structopt = "0.3.22"
