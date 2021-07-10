@@ -26,7 +26,7 @@ struct TraceyArgs {
     #[structopt(long)]
     rays: u32,
 
-    /// Path to mesh that will be put into a Cornell box scene
+    /// Path to .obj mesh that will be put into a Cornell box scene
     #[structopt(long, conflicts_with = "sample-scene")]
     mesh_path: Option<String>,
 
@@ -52,10 +52,20 @@ fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scen
     } else {
         match sample_scene.unwrap() {
             0 => {
+                let white_mat = Arc::new(Lambertian::new(Color::new(1.0, 1.0, 1.0)));
+                let mut objects = World::default();
+                let triangle_mesh_opt = load_mesh(
+                    Path::new("./sample_meshes/cornell_box_objects.obj"),
+                    white_mat,
+                );
+                objects.add(Arc::new(triangle_mesh_opt.unwrap()));
+                get_cornell_box_scene(objects)
+            }
+            1 => {
                 let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
                 let mut objects = World::default();
                 let triangle_mesh_opt =
-                    load_mesh(Path::new("./sample_meshes/tachikoma_3.obj"), blue_mat);
+                    load_mesh(Path::new("./sample_meshes/tachikoma.obj"), blue_mat);
                 objects.add(Arc::new(triangle_mesh_opt.unwrap()));
                 get_cornell_box_scene(objects)
             }

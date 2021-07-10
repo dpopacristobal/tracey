@@ -10,8 +10,9 @@ use crate::linalg::Point3;
 use crate::materials::Material;
 
 pub fn load_mesh(mesh_path: &Path, material: Arc<dyn Material>) -> Option<BvhNode> {
-    let input = BufReader::new(File::open(mesh_path).ok().unwrap());
-    let model: Obj = load_obj(input).ok().unwrap();
+    let input =
+        BufReader::new(File::open(mesh_path).expect("Path to specified .obj file is invalid"));
+    let model: Obj = load_obj(input).expect("Failed to parse specified .obj file");
 
     let mut hittable_list = World::default();
 
