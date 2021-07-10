@@ -27,25 +27,25 @@ impl Triangle {
 
 impl Hit for Triangle {
     fn hit(&self, ray: Ray, _t_min: f64, _t_max: f64) -> Option<HitRecord> {
-        let edge1 = self.vertices[1] - self.vertices[0];
-        let edge2 = self.vertices[2] - self.vertices[0];
-        let h = ray.direction().cross(edge2);
-        let a = edge1.dot(h);
-        if a > -0.0001 && a < 0.0001 {
+        let edge0 = self.vertices[1] - self.vertices[0];
+        let edge1 = self.vertices[2] - self.vertices[0];
+        let pvec = ray.direction().cross(edge1);
+        let det = edge0.dot(pvec);
+        if det < 0.0001 {
             return None;
         }
-        let f = 1.0 / a;
-        let s = *ray.origin() - self.vertices[0];
-        let u = f * s.dot(h);
+        let inv_det = 1.0 / det;
+        let tvec = *ray.origin() - self.vertices[0];
+        let u = tvec.dot(pvec) * inv_det;
         if u < 0.0 || u > 1.0 {
             return None;
         }
-        let q = s.cross(edge1);
-        let v = f * ray.direction().dot(q);
-        if v < 0.01 || u + v > 1.0 {
+        let gvec = tvec.cross(edge0);
+        let v = ray.direction().dot(gvec) * inv_det;
+        if v < 0.0 || u + v > 1.0 {
             return None;
         }
-        let t = f * edge2.dot(q);
+        let t = edge1.dot(gvec) * inv_det;
         if t < 0.0001 {
             return None;
         }
