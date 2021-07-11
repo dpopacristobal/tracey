@@ -1,14 +1,10 @@
-use std::path::Path;
 use std::sync::Arc;
 
 use rand::Rng;
 use rayon::prelude::*;
 
-use crate::camera::Camera;
-use crate::hittables::{BvhNode, FlipFace, Hit, World, XYRect, XZRect, YZRect};
-use crate::linalg::{Color, Point3, Ray, Vec3};
-use crate::load_mesh::load_mesh;
-use crate::materials::{DiffuseLight, Lambertian, Metal};
+use crate::hittables::{Hit, World};
+use crate::linalg::{Color, Ray};
 use crate::pdfs::{HittablePDF, MixturePDF, PDF};
 use crate::scene::Scene;
 
@@ -66,6 +62,7 @@ fn ray_color(
 }
 
 pub fn render(image_width: u32, samples_per_pixel: u32, scene: Scene) {
+    // TODO(dpopacristobal): Would it be worth exposing this in the CLI?
     let max_depth = 20;
     let image_height = (image_width as f64 / scene.aspect_ratio) as u32;
 

@@ -1,11 +1,9 @@
-use std::path::Path;
 use std::sync::Arc;
 
 use crate::camera::Camera;
 use crate::hittables::{BvhNode, FlipFace, Hit, World, XYRect, XZRect, YZRect};
-use crate::linalg::{Color, Point3, Ray, Vec3};
-use crate::load_mesh::load_mesh;
-use crate::materials::{DiffuseLight, Lambertian, Metal};
+use crate::linalg::{Color, Point3, Vec3};
+use crate::materials::{DiffuseLight, Lambertian};
 
 pub struct Scene {
     pub world: World,
@@ -58,9 +56,7 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
     let red_mat = Arc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
     let white_mat = Arc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
-    let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
-    let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
     let mut hittable_list = World::default();
     for object in objects.objects() {
         hittable_list.add(object.clone());
