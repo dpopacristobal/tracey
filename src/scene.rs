@@ -36,7 +36,7 @@ impl Scene {
 pub fn get_cornell_box_scene(objects: World) -> Scene {
     let aspect_ratio = 1.0;
 
-    // Camera
+    // Set up the camera.
     let look_from = Point3::new(277.5, 277.5, -800.0);
     let look_at = Point3::new(277.5, 277.5, 0.0);
     let up_direction = Vec3::new(0.0, 1.0, 0.0);
@@ -65,18 +65,7 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
     let green_mat = Arc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
     let light_mat = Arc::new(DiffuseLight::new(Color::new(15.0, 15.0, 15.0)));
 
-    hittable_list.add(Arc::new(YZRect::new(
-        0.0,
-        555.0,
-        0.0,
-        555.0,
-        555.0,
-        red_mat.clone(),
-    )));
-    hittable_list.add(Arc::new(YZRect::new(
-        0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
-    )));
-
+    // Light that illuminates the Cornell box.
     hittable_list.add(Arc::new(FlipFace::new(Arc::new(XZRect::new(
         213.0,
         343.0,
@@ -86,6 +75,22 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
         light_mat.clone(),
     )))));
 
+    // Left wall of the Cornell box.
+    hittable_list.add(Arc::new(YZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        red_mat.clone(),
+    )));
+
+    // Right wall of the Cornell box.
+    hittable_list.add(Arc::new(YZRect::new(
+        0.0, 555.0, 0.0, 555.0, 0.0, green_mat,
+    )));
+
+    // Floor of the Cornell box.
     hittable_list.add(Arc::new(XZRect::new(
         0.0,
         555.0,
@@ -95,7 +100,7 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
         white_mat.clone(),
     )));
 
-    // Top
+    // Ceiling of the Cornell box.
     hittable_list.add(Arc::new(XZRect::new(
         0.0,
         555.0,
@@ -105,7 +110,7 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
         white_mat.clone(),
     )));
 
-    // Back
+    // Back wall of the Cornell box.
     hittable_list.add(Arc::new(XYRect::new(
         0.0, 555.0, 0.0, 555.0, 555.0, white_mat,
     )));
@@ -124,7 +129,7 @@ pub fn get_cornell_box_scene(objects: World) -> Scene {
 pub fn get_random_spheres_scene() -> Scene {
     let aspect_ratio = 1.5;
 
-    // Camera
+    // Set up the camera.
     let look_from = Point3::new(13.0, 2.0, 3.0);
     let look_at = Point3::new(0.0, 0.0, 0.0);
     let up_direction = Vec3::new(0.0, 1.0, 0.0);
@@ -153,6 +158,8 @@ pub fn get_random_spheres_scene() -> Scene {
     )));
 
     let mut rng = rand::thread_rng();
+
+    // Create a large number of small random spheres.
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = rng.gen_range(0.0, 1.0);
@@ -164,15 +171,17 @@ pub fn get_random_spheres_scene() -> Scene {
 
             if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_mat: Arc<dyn Material> = if choose_mat < 0.8 {
-                    // Diffuse
+                    // Create a random lambertian sphere.
                     let color =
                         Color::random_from_bounds(0.0, 1.0) * Color::random_from_bounds(0.0, 1.0);
                     Arc::new(Lambertian::new(color))
                 } else if choose_mat < 0.95 {
+                    // Create a random metal sphere.
                     let color = Color::random_from_bounds(0.5, 1.0);
                     let fuzz = rng.gen_range(0.0, 0.5);
                     Arc::new(Metal::new(color, fuzz))
                 } else {
+                    // Create a random dielectric sphere.
                     Arc::new(Dielectric::new(1.5))
                 };
 
@@ -181,6 +190,7 @@ pub fn get_random_spheres_scene() -> Scene {
         }
     }
 
+    // Create a large lambertian sphere in a fixed position.
     let lambertian_mat = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
@@ -188,6 +198,7 @@ pub fn get_random_spheres_scene() -> Scene {
         lambertian_mat,
     )));
 
+    // Create a large dielectric sphere in a fixed position.
     let dielectric_mat = Arc::new(Dielectric::new(1.5));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
@@ -195,6 +206,7 @@ pub fn get_random_spheres_scene() -> Scene {
         dielectric_mat,
     )));
 
+    // Create a large metal sphere in a fixed position.
     let metal_mat = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(4.0, 1.0, 0.0),

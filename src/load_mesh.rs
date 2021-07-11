@@ -31,5 +31,6 @@ pub fn load_mesh(mesh_path: &Path, material: Arc<dyn Material>) -> BvhNode {
         hittable_list.add(Arc::new(Triangle::new(tri_verts, material.clone())));
     }
 
+    // Place all the triangles inside a BVH structure to make the ray-triangle intersection checks faster.
     BvhNode::from_world(&mut hittable_list, 0.0, 1.0)
 }

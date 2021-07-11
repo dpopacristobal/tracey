@@ -68,7 +68,7 @@ pub fn render(image_width: u32, samples_per_pixel: u32, scene: Scene) {
 
     let mut image_buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
 
-    // Render
+    // Render the scene.
     let mut pixels: Vec<(u32, u32, &mut image::Rgb<u8>)> = Vec::new();
     pixels.reserve((image_width * image_height) as usize);
     for (i, j, pixel) in image_buffer.enumerate_pixels_mut() {
@@ -96,6 +96,6 @@ pub fn render(image_width: u32, samples_per_pixel: u32, scene: Scene) {
         **pixel = image::Rgb(pixel_color.gamma_2_correct().into_rgb8());
     });
 
-    // Output Image
+    // Output the rendered image to .png.
     image_buffer.save("out/rendered_image.png").unwrap();
 }
