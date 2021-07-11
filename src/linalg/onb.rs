@@ -1,5 +1,6 @@
 use super::Vec3;
 
+// ONB in this context refers to Orthonormal Basis.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ONB {
     u: Vec3,
@@ -12,13 +13,13 @@ impl ONB {
         let unit_n = n.into_unit_vec();
         let w = unit_n;
 
-        let a = if w.x().abs() > 0.9 {
+        let unit_vec = if w.x().abs() > 0.9 {
             Vec3::new(0.0, 1.0, 0.0)
         } else {
             Vec3::new(1.0, 0.0, 0.0)
         };
 
-        let v = w.cross(a).into_unit_vec();
+        let v = w.cross(unit_vec).into_unit_vec();
         let u = w.cross(v);
 
         Self { u, v, w }

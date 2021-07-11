@@ -82,7 +82,7 @@ impl Vec3 {
         self.x
     }
 
-    pub fn x_mut<'a>(&'a mut self) -> &'a mut f64 {
+    pub fn x_mut(&mut self) -> &mut f64 {
         &mut self.x
     }
 
@@ -90,7 +90,7 @@ impl Vec3 {
         self.y
     }
 
-    pub fn y_mut<'a>(&'a mut self) -> &'a mut f64 {
+    pub fn y_mut(&mut self) -> &mut f64 {
         &mut self.y
     }
 
@@ -98,7 +98,7 @@ impl Vec3 {
         self.z
     }
 
-    pub fn z_mut<'a>(&'a mut self) -> &'a mut f64 {
+    pub fn z_mut(&mut self) -> &mut f64 {
         &mut self.z
     }
 
@@ -298,7 +298,6 @@ impl IndexMut<usize> for Vec3 {
     }
 }
 
-// [TODO] Make testing more exhaustive by not having 0.0 in the tests,
 #[cfg(test)]
 mod test {
     use super::Vec3;

@@ -26,7 +26,7 @@ impl Material for Metal {
             reflected_direction + Vec3::random_in_unit_sphere().mul_scalar(self.fuzz_factor),
         );
 
-        // This is probably not how you do this and there is a much neater way
+        // TODO(dpopacristobal): There is probably a much neater way of doing this...
         let mut ret: Option<ScatterRecord> = None;
         if reflected_ray.direction().dot(hit_record.normal) > 0.0 {
             ret = Some(ScatterRecord::new(Some(reflected_ray), None, self.albedo));

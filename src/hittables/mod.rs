@@ -13,7 +13,7 @@ pub mod sphere;
 pub mod triangle;
 pub mod world;
 
-// Do we actually want to export this or do we just want to do it for boxes?
+// TODO(dpopacristobal): Do we actually want to export this or do we just want to do it for boxes?
 pub mod axis_aligned_rects;
 
 use std::sync::Arc;

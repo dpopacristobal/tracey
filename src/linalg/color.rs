@@ -237,7 +237,6 @@ impl fmt::Display for Color {
     }
 }
 
-// [TODO] Make testing more exhaustive by not having 0.0 in the tests,
 #[cfg(test)]
 mod test {
     use super::Color;

@@ -16,6 +16,7 @@ impl MixturePDF {
     }
 }
 
+// TODO(dpopacristobal): Should the user be allowed to specify the weight assigned to each PDF?
 impl PDF for MixturePDF {
     fn value(&self, direction: Vec3) -> f64 {
         0.5 * self.pdfs[0].value(direction) + 0.5 * self.pdfs[1].value(direction)

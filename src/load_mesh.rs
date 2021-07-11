@@ -9,7 +9,7 @@ use crate::hittables::{BvhNode, Triangle, World};
 use crate::linalg::Point3;
 use crate::materials::Material;
 
-pub fn load_mesh(mesh_path: &Path, material: Arc<dyn Material>) -> Option<BvhNode> {
+pub fn load_mesh(mesh_path: &Path, material: Arc<dyn Material>) -> BvhNode {
     let input =
         BufReader::new(File::open(mesh_path).expect("Path to specified .obj file is invalid"));
     let model: Obj = load_obj(input).expect("Failed to parse specified .obj file");
@@ -31,6 +31,5 @@ pub fn load_mesh(mesh_path: &Path, material: Arc<dyn Material>) -> Option<BvhNod
         hittable_list.add(Arc::new(Triangle::new(tri_verts, material.clone())));
     }
 
-    let bvh_node = BvhNode::from_world(&mut hittable_list, 0.0, 1.0);
-    Some(bvh_node)
+    BvhNode::from_world(&mut hittable_list, 0.0, 1.0)
 }

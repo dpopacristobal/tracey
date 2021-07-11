@@ -5,9 +5,9 @@ use std::sync::Arc;
 use super::{BoundingBox, Hit, HitRecord, World};
 use crate::linalg::Ray;
 
-// Could we replace this and just use generics with traits?
+// TODO(dpopacristobal): Could we replace this and just use generics with traits?
 fn b_box_compare(hittable_a: Arc<dyn Hit>, hittable_b: Arc<dyn Hit>, axis: i32) -> Ordering {
-    // TODO(dnlpc): Add some actual error-handling.
+    // TODO(dpopacristobal): Should we add proper error-handling here?
     let box_a = hittable_a.bounding_box(0.0, 0.0).unwrap();
     let box_b = hittable_b.bounding_box(0.0, 0.0).unwrap();
 

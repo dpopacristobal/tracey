@@ -46,18 +46,18 @@ fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scen
         let grey_mat = Arc::new(Lambertian::new(Color::new(0.25, 0.25, 0.25)));
         let mut objects = World::default();
         let triangle_mesh_opt = load_mesh(Path::new(&mesh_path), grey_mat);
-        objects.add(Arc::new(triangle_mesh_opt.unwrap()));
+        objects.add(Arc::new(triangle_mesh_opt));
         get_cornell_box_scene(objects)
     } else {
         match sample_scene.unwrap() {
             0 => {
                 let white_mat = Arc::new(Lambertian::new(Color::new(1.0, 1.0, 1.0)));
                 let mut objects = World::default();
-                let triangle_mesh_opt = load_mesh(
+                let box_objects_mesh = load_mesh(
                     Path::new("./sample_meshes/cornell_box_objects.obj"),
                     white_mat,
                 );
-                objects.add(Arc::new(triangle_mesh_opt.unwrap()));
+                objects.add(Arc::new(box_objects_mesh));
                 get_cornell_box_scene(objects)
             }
             1 => {
@@ -72,23 +72,23 @@ fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scen
                     Path::new("./sample_meshes/cornell_box_objects.obj"),
                     white_mat,
                 );
-                objects.add(Arc::new(box_objects_mesh.unwrap()));
+                objects.add(Arc::new(box_objects_mesh));
 
                 let tachikoma_mesh = load_mesh(
                     Path::new("./sample_meshes/tachikoma_small.obj"),
                     tachikoma_mat,
                 );
-                objects.add(Arc::new(tachikoma_mesh.unwrap()));
+                objects.add(Arc::new(tachikoma_mesh));
 
                 let tie_fighter_mesh = load_mesh(
                     Path::new("./sample_meshes/tie_fighter.obj"),
                     tie_fighter_mat,
                 );
-                objects.add(Arc::new(tie_fighter_mesh.unwrap()));
+                objects.add(Arc::new(tie_fighter_mesh));
 
                 let monkey_mesh =
                     load_mesh(Path::new("./sample_meshes/blender_monkey.obj"), monkey_mat);
-                objects.add(Arc::new(monkey_mesh.unwrap()));
+                objects.add(Arc::new(monkey_mesh));
 
                 get_cornell_box_scene(objects)
             }
