@@ -6,7 +6,7 @@ use std::sync::Arc;
 use rey_skytracer::hittables::World;
 use rey_skytracer::linalg::Color;
 use rey_skytracer::load_mesh::load_mesh;
-use rey_skytracer::materials::Lambertian;
+use rey_skytracer::materials::{Lambertian, Metal};
 use rey_skytracer::render::render;
 use rey_skytracer::scene::{get_cornell_box_scene, Scene};
 
@@ -62,14 +62,15 @@ fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scen
                 get_cornell_box_scene(objects)
             }
             1 => {
+                let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
                 let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
                 let mut objects = World::default();
                 let triangle_mesh_opt =
-                    load_mesh(Path::new("./sample_meshes/tachikoma.obj"), blue_mat);
+                    load_mesh(Path::new("./sample_meshes/tachikoma.obj"), metal_mat);
                 objects.add(Arc::new(triangle_mesh_opt.unwrap()));
                 get_cornell_box_scene(objects)
             }
-            _ => panic!("Invalid sample-scene value used. Use one of [0]"),
+            _ => panic!("Invalid sample-scene value used. Use one of [0, 1]"),
         }
     }
 }
