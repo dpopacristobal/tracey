@@ -6,7 +6,7 @@ use std::sync::Arc;
 use rey_skytracer::hittables::World;
 use rey_skytracer::linalg::Color;
 use rey_skytracer::load_mesh::load_mesh;
-use rey_skytracer::materials::{Lambertian, Metal};
+use rey_skytracer::materials::Lambertian;
 use rey_skytracer::render::render;
 use rey_skytracer::scene::{get_cornell_box_scene, get_random_spheres_scene, Scene};
 
@@ -42,7 +42,6 @@ fn main() {
 }
 
 fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scene {
-    // let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
     if let Some(mesh_path) = mesh_path {
         let grey_mat = Arc::new(Lambertian::new(Color::new(0.25, 0.25, 0.25)));
         let mut objects = World::default();
@@ -62,12 +61,35 @@ fn scene_from_args(mesh_path: Option<String>, sample_scene: Option<u32>) -> Scen
                 get_cornell_box_scene(objects)
             }
             1 => {
-                let metal_mat = Arc::new(Metal::new(Color::new(0.45, 0.71, 0.95), 0.2));
-                let blue_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
+                let white_mat = Arc::new(Lambertian::new(Color::new(1.0, 1.0, 1.0)));
+                let tachikoma_mat = Arc::new(Lambertian::new(Color::new(0.45, 0.71, 0.95)));
+                let tie_fighter_mat = Arc::new(Lambertian::new(Color::new(0.196, 0.18, 0.176)));
+                let monkey_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.255, 0.0)));
+
                 let mut objects = World::default();
-                let triangle_mesh_opt =
-                    load_mesh(Path::new("./sample_meshes/tachikoma.obj"), blue_mat);
-                objects.add(Arc::new(triangle_mesh_opt.unwrap()));
+
+                let box_objects_mesh = load_mesh(
+                    Path::new("./sample_meshes/cornell_box_objects.obj"),
+                    white_mat,
+                );
+                objects.add(Arc::new(box_objects_mesh.unwrap()));
+
+                let tachikoma_mesh = load_mesh(
+                    Path::new("./sample_meshes/tachikoma_small.obj"),
+                    tachikoma_mat,
+                );
+                objects.add(Arc::new(tachikoma_mesh.unwrap()));
+
+                let tie_fighter_mesh = load_mesh(
+                    Path::new("./sample_meshes/tie_fighter.obj"),
+                    tie_fighter_mat,
+                );
+                objects.add(Arc::new(tie_fighter_mesh.unwrap()));
+
+                let monkey_mesh =
+                    load_mesh(Path::new("./sample_meshes/blender_monkey.obj"), monkey_mat);
+                objects.add(Arc::new(monkey_mesh.unwrap()));
+
                 get_cornell_box_scene(objects)
             }
             2 => get_random_spheres_scene(),
