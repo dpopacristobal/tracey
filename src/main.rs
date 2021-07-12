@@ -13,10 +13,7 @@ use tracey::scene::{get_cornell_box_scene, get_random_spheres_scene, Scene};
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
-#[structopt(
-    name = "Tracey",
-    about = "A simple CLI to show the ray tracing capabilities in Tracey."
-)]
+#[structopt(name = "tracey", about = "A simple CLI to render scenes using tracey.")]
 struct TraceyArgs {
     /// Width of the output image in pixels
     #[structopt(long)]
@@ -26,7 +23,7 @@ struct TraceyArgs {
     #[structopt(long)]
     rays: u32,
 
-    /// Path to .obj mesh that will be put into a Cornell box scene
+    /// Path to .obj mesh that will be put into a Cornell Box scene
     #[structopt(long, conflicts_with = "sample-scene")]
     mesh_path: Option<String>,
 
