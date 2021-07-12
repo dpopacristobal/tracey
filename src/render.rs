@@ -1,3 +1,4 @@
+use std::fs;
 use std::sync::Arc;
 
 use rand::Rng;
@@ -97,5 +98,7 @@ pub fn render(image_width: u32, samples_per_pixel: u32, scene: Scene) {
     });
 
     // Output the rendered image to .png.
+    fs::create_dir_all("out")
+        .expect("Output directory does not exist and failed trying to create it");
     image_buffer.save("out/rendered_image.png").unwrap();
 }
