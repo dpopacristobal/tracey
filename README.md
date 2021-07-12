@@ -1,6 +1,6 @@
 # tracey
 
-`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/).
+`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/), though it includes some additional features as well.
 
 ## Sample Renders
 
@@ -20,7 +20,7 @@
 
 `tracey` can be run as a CLI app thanks to Rust's [structopt](https://github.com/TeXitoi/structopt) library. The CLI allows users to render the sample scenes shown above. Additionally, users can instead input the path to an `.obj` triangle mesh file, which will be rendered inside the Cornell Box scene; note that this will only work if the mesh lies inside the [0, 0, 0] to [555, 555, 555] cube.
 
-Compiling and running `tracey` in this way will require users to have Rust installed. A good [tutorial](https://doc.rust-lang.org/book/ch01-01-installation.html) for installing Rust is available as part of [The Rust Programming Language book](https://doc.rust-lang.org/book/title-page.html).
+Compiling and running `tracey` in this way will require users to have Rust installed. A good [tutorial](https://doc.rust-lang.org/book/ch01-01-installation.html) for installing Rust is available as part of [The Rust Programming Language](https://doc.rust-lang.org/book/title-page.html) book.
 
 These are the options provided by the CLI:
 ```
