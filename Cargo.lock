@@ -448,17 +448,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rey_skytracer"
-version = "0.1.0"
-dependencies = [
- "image",
- "obj-rs",
- "rand",
- "rayon",
- "structopt",
-]
-
-[[package]]
 name = "scoped_threadpool"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -549,6 +538,17 @@ dependencies = [
  "byteorder",
  "lzw",
  "miniz_oxide",
+]
+
+[[package]]
+name = "tracey"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "obj-rs",
+ "rand",
+ "rayon",
+ "structopt",
 ]
 
 [[package]]

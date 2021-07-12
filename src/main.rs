@@ -1,14 +1,14 @@
-extern crate rey_skytracer;
+extern crate tracey;
 
 use std::path::Path;
 use std::sync::Arc;
 
-use rey_skytracer::hittables::World;
-use rey_skytracer::linalg::Color;
-use rey_skytracer::load_mesh::load_mesh;
-use rey_skytracer::materials::Lambertian;
-use rey_skytracer::render::render;
-use rey_skytracer::scene::{get_cornell_box_scene, get_random_spheres_scene, Scene};
+use tracey::hittables::World;
+use tracey::linalg::Color;
+use tracey::load_mesh::load_mesh;
+use tracey::materials::Lambertian;
+use tracey::render::render;
+use tracey::scene::{get_cornell_box_scene, get_random_spheres_scene, Scene};
 
 use structopt::StructOpt;
 

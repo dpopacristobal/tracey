@@ -171,7 +171,7 @@ pub fn get_random_spheres_scene() -> Scene {
 
             if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_mat: Arc<dyn Material> = if choose_mat < 0.8 {
-                    // Create a random lambertian sphere.
+                    // Create a random Lambertian sphere.
                     let color =
                         Color::random_from_bounds(0.0, 1.0) * Color::random_from_bounds(0.0, 1.0);
                     Arc::new(Lambertian::new(color))
@@ -190,7 +190,7 @@ pub fn get_random_spheres_scene() -> Scene {
         }
     }
 
-    // Create a large lambertian sphere in a fixed position.
+    // Create a large Lambertian sphere in a fixed position.
     let lambertian_mat = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),

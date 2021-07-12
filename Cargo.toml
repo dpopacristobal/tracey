@@ -1,15 +1,15 @@
 [package]
-name = "rey_skytracer"
+name = "tracey"
 version = "0.1.0"
-authors = ["Daniel Popa <danielpopacristobal@gmail.com>"]
+authors = ["Daniel Popa Cristobal <dpopacristobal@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "rey_skytracer"
+name = "tracey"
 path = "src/lib.rs"
 
 [[bin]]
-name = "rey_skytracer"
+name = "tracey"
 path = "src/main.rs"
 
 [dependencies]
