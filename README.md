@@ -1,6 +1,6 @@
 # tracey
 
-`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/), though it includes some additional features as well. There are probably many Rust newbie mistakes in the code and a lot of them are likely caused by me trying to "translate" C++ to Rust when I was starting off. Overall, it was an incredibly fun self-contained project to work on and I would definitely recommend the books to anyone interested in an introductory graphics project. A more advanced book for exploring rendering would be [Physically Based Rendering](https://www.pbrt.org/), which I've heard great things about.
+`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/), though it includes some additional features as well. There are probably many Rust newbie mistakes in the code and a lot of them are likely caused by me trying to "translate" C++ to Rust when I was starting off. Overall, it was an incredibly fun, self-contained project to work on, and I would definitely recommend the books to anyone looking for an introductory graphics project. A more advanced book on rendering would be [Physically Based Rendering](https://www.pbrt.org/), which I've heard great things about.
 
 ## Sample Renders
 
@@ -57,6 +57,6 @@ This is a list of the main features that I have implemented in `tracey` so far:
 This is a list of ideas for new features (or tech-debt clean-up) that could be added to `tracey`:
 - Implementing texture rendering.
 - Improving how materials are attached to objects.
-- Improving how objects are added to the scene.
+- Improving how objects are added to a scene.
 - Implementing Surface Area Heuristics (SAH) to improve the use of BVHs (here is a great [blog](https://medium.com/@bromanz/how-to-create-awesome-accelerators-the-surface-area-heuristic-e14b5dec6160) post on the subject).
 - Adding more materials.
