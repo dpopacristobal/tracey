@@ -1,20 +1,20 @@
 # tracey
 
-`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/), though it includes some additional features as well.
+`tracey` is a toy ray tracer that I wrote whilst tinkering with Rust. I had two main goals in mind whilst working on this project: to learn more about programming in Rust (and specifically how Rust compares to C++) and to learn more about rendering, which was adjacent to the geometry modeling work I was doing at Autodesk at the time. The project is based on Peter Shirley's "[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)" and its [sequels](https://raytracing.github.io/), though it includes some additional features as well. There are probably many Rust newbie mistakes in the code and a lot of them are likely caused by me trying to "translate" C++ to Rust when I was starting off. On the whole, it was an incredibly fun project to work on and I would definitely recommend the books to anyone interested in an introductory graphics project.
 
 ## Sample Renders
 
-### Classic Cornell Box Scene - 1080x1080 @ 10 rays per pixel
+### Classic Cornell Box Scene - 1280x1280 @ 2000 rays per pixel
 
-![scene_0](./sample_renders/scene_0.png)
+![scene_0](./sample_renders/scene_0_2000.png)
 
-### Nerdier Cornell Box Scene - 1080x1080 @ 10 rays per pixel
+### Geekier Cornell Box Scene - 1280x1280 @ 2000 rays per pixel
 
-![scene_1](./sample_renders/scene_1.png)
+![scene_1](./sample_renders/scene_1_2000.png)
 
-### Random Spheres Scene - 1080x720 @ 10 rays per pixel
+### Random Spheres Scene - 1280x853 @ 10 rays per pixel
 
-![scene_2](./sample_renders/scene_2.png)
+![scene_2](./sample_renders/scene_2_2000.png)
 
 ## Usage
 
